@@ -74,7 +74,7 @@ class Picrawler::PiXA
 		@page+=1
 		if @seek_end then return false end
 		begin
-			@agent.get('http://www.pixa.cc/profiles/show/'+@arg+'&page='+@page.to_s)
+			@agent.get('http://www.pixa.cc/profiles/show/'+@arg+'?page='+@page.to_s)
 		rescue
 			return false
 		end
