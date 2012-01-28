@@ -1,0 +1,64 @@
+#!/usr/bin/env ruby1.9.1
+#coding:utf-8
+if RUBY_VERSION < '1.9.0' then $KCODE="u" end
+
+picrawler_gateway_path="Picrawler.rb" ###
+
+###main
+require "optparse"
+require "fileutils"
+
+Version = "0.01.120128"
+STDOUT.sync = true
+Dir.chdir(File.dirname(__FILE__))
+
+require File.expand_path(picrawler_gateway_path) ### Picrawler module path ###
+pic=Picrawler.new(File.expand_path("Picrawler.ini"))
+
+#parse ARGV
+dir=nil
+bookmark=0
+fast=false
+mode=nil
+OptionParser.new{|opt| #todo: trap Exception and show message in proper way
+	opt.banner=
+		"Usage: "+opt.program_name+" [options] COMMAND\n"+
+		"COMMAND is SITE [MODE ARG]\n"+
+		"ex) PiXA -> list available MODE of PiXA\n"+
+		"ex) PiXA tag foobar -> crawl PiXA's tag foobar\n"
+	opt.on('-l','--list','show illust websites (module names)'){|v| pic.list.each{|e| puts e};exit }
+	#opt.on('-i VAL','--id','illustrator id'){|v| id=v}
+	#opt.on('-t VAL','--tag','illust tag'){|v| tag=v}
+	opt.on('-d VAL','--dir','save dir'){|v| dir=v}
+	opt.on('-b VAL','--bookmark','bookmark number'){|v| bookmark=v.to_i}
+	opt.on('-f','--fast','fast mode: stops immediately when duplicated'){|v| fast=true}
+	opt.on('-h','--help','show this message'){|v| puts "Picrawler"+" "+Version;puts opt;exit}
+	opt.on('-v','--version','print version'){|v| puts "Picrawler"+" "+Version;exit} #File.basename($0)
+	if ARGV.length==0 then puts "Picrawler"+" "+Version;puts opt;exit end
+	mode=opt.parse(ARGV.map{|e| e.encode("UTF-8",pic.encoding)})
+	#if mode.length==0 then raise "SITE is mandatory." end
+	if mode.length==1 then pic.mode_list(mode[0]).each{|e| puts e};exit end
+	if mode.length!=3 then raise "COMMAND -> SITE MODE ARG" end
+}
+
+unless pic.open(mode[0]) then exit end
+if dir==nil then dir=mode[2] end
+dir.encode!(pic.encoding,"UTF-8")
+FileUtils.mkpath(dir)
+Dir.chdir(dir)
+
+#filter
+filter=Dir.glob("*").map{|e| File.basename(e,".*")}.sort
+begin
+	File.open("filter.txt"){|f|
+		filter+=f.readlines
+	}
+rescue; end
+
+unless pic.call_first(mode[1],mode[2],bookmark,fast,filter)
+	puts "Failed to retrive first page (perhaps not found)"
+	exit
+end
+begin
+	pic.crawl
+end while pic.call_next(mode[1])
