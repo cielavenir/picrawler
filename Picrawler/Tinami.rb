@@ -2,7 +2,9 @@
 
 #Picrawler under CC0
 #Picrawler::Tinami module
-#!!! Not implemented yet. Too many modes... !!!
+#!!! Very experimental. Too many modes... !!!
+
+# type[]=X X->1=illust,2=comic,3=model,4=novel,5=cosplay
 
 =begin
 POST /view/ID HTTP/1.1
@@ -44,13 +46,12 @@ class Picrawler::Tinami
 		@bookmark=0
 		@fast=false
 		@filter=[]
+		@type=1
 	end
 
 	def list() return [] end
 
 	def open(user,pass,cookie)
-		raise "not implemented yet."
-
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
 			if @agent.cookie_jar.jar["www.tinami.com"]
@@ -78,14 +79,36 @@ class Picrawler::Tinami
 		@fast=fast
 		@filter=filter
 		@seek_end=false
+		@type=1
 
 		@page=0
 		ret=member_next
-		if ret then puts 'Browsing '+arg end
+		if ret then puts 'Browsing http://www.tinami.com/search/list?sort=new&type[]=1&prof_id='+arg end
 		return ret
 	end
 
 	def member_next
+		if @seek_end then return false end
+		begin
+			@agent.get('http://www.tinami.com/search/list?sort=new&type[]=1&prof_id='+@arg+'&offset='+(@page*20).to_s)
+		rescue
+			return false
+		end
+
+		unless @agent.page.body.resolve=~/id="next-page"/ then @seek_end=true end
+		@content=[]
+		array=@agent.page.body.resolve.split("<a href=\"/view/")
+		array.shift
+		array.each{|e|
+			bookmark=0
+			if e=~/(\d+)/
+				if @bookmark>0 && bookmark<@bookmark then next end
+				@content.push($1)
+			end
+		}
+		@page+=1
+		sleep(@sleep)
+		return true
 	end
 
 	def tag_first(arg,bookmark,fast,filter)
@@ -95,23 +118,64 @@ class Picrawler::Tinami
 		@fast=fast
 		@filter=filter
 		@seek_end=false
+		@type=1
 
 		@page=0
 		ret=tag_next
-		if ret then puts 'Browsing '+arg end
+		if ret then puts 'Browsing http://www.tinami.com/search/list?sort=new&type[]=1&keyword='+arg end
 		return ret
 	end
 
 	def tag_next
+		if @seek_end then return false end
+		begin
+			@agent.get('http://www.tinami.com/search/list?sort=new&type[]=1&keyword='+@arg.uriEncode+'&offset='+(@page*20).to_s)
+		rescue
+			return false
+		end
+
+		unless @agent.page.body.resolve=~/id="next-page"/ then @seek_end=true end
+		@content=[]
+		array=@agent.page.body.resolve.split("<a href=\"/view/")
+		array.shift
+		array.each{|e|
+			bookmark=0
+			if e=~/(\d+)/
+				if @bookmark>0 && bookmark<@bookmark then next end
+				@content.push($1)
+			end
+		}
+		@page+=1
+		sleep(@sleep)
+		return true
 	end
 
 	def crawl
-		@content.each_with_index{|e,i|
-			if @filter.include?(File.basename(e,".*"))
-				if @fast then @seek_end=true end
-			else
-				###
-				sleep(@sleep)
+		@content.each_with_index{|e,i| # e -> ID
+			case @type
+				when 1
+					if @filter.include?(e)
+						if @fast then @seek_end=true end
+					else
+						@agent.get('http://www.tinami.com/view/'+e, [], 'http://www.tinami.com/') #2.1 syntax
+						sleep(1)
+						forms = @agent.page.forms
+						if forms.length > 2
+							form=forms[2]
+							body=@agent.submit(form).body
+							sleep(1)
+							if body=~/(http\:\/\/img.tinami.com\/illust\d*\/img\/\d+\/[0-9a-f]+\.(jpeg|jpg|png|gif))/
+								ext=$2
+								@agent.get($1, [], 'http://www.tinami.com/') #2.1 syntax
+								@agent.page.save_as(e+"."+ext) #as file is written after obtaining whole file, it should be less dangerous.
+								sleep(@sleep)
+							else
+								raise "[Programmer's fault] cannot parse HTML:\n"+body
+							end
+						end
+					end
+				else
+					raise "Type "+@type.to_s+" not implemented!"
 			end
 			printf("Page %d %d/%d    \r",@page,i+1,@content.length) 
 		}

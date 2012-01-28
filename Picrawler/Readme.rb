@@ -6,6 +6,8 @@
 
 =begin
 Picrawler under CC0
+An extendable picture website downloader
+
 You may do anything for this source code.
 
 [Dependency]
@@ -47,6 +49,10 @@ Added NicoSeiga support.
 Added Pixiv support.
 0.01.120128
 Added Danbooru/DeviantART support.
+0.02.120129
+Fixed PiXA paging.
+Temporary supports Fg.
+Added very experimental Tinami support. only illust search is available.
 
 [Creative Commons CC0]
 Statement of Purpose

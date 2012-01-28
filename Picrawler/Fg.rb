@@ -4,10 +4,6 @@
 #Picrawler::Fg module
 #bookmark isn't implemented.
 
-#!!! Not implemented yet. !!!
-
-# syntax: "http://image1.fg-site.net/image/mid/NUM/midID_0_TOTALID.jpg".gsub("/mid","/org")
-
 require "rubygems"
 require "mechanize"
 require "uri"
@@ -41,8 +37,6 @@ class Picrawler::Fg
 	def list() return ["member","search"] end
 
 	def open(user,pass,cookie)
-		raise "Almost completed, but I'm waiting for fg-site renewal."
-
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
 			if @agent.cookie_jar.jar["fg-site.net"]
@@ -78,7 +72,28 @@ class Picrawler::Fg
 	end
 
 	def member_next
-		#separator: "次の20件"
+		@page+=1
+		if @seek_end then return false end
+		begin
+			@agent.get('http://www.fg-site.net/contents/view/user_id:'+@arg+'/page:'+@page.to_s)
+		rescue
+			return false
+		end
+
+		unless @agent.page.body.resolve=~/次の20件/ then @seek_end=true end ###
+		@content=[]
+		array=@agent.page.body.resolve.split("<a href=\"http://www.fg-site.net/products/")
+		array.shift
+		array.each{|e|
+			bookmark=0
+			if e=~/.+?(http\:\/\/image.+?\.fg-site\.net\/image\/mid\/\d+\/(.+?\.(jpeg|jpg|png|gif)))/m
+				if @bookmark>0 && bookmark<@bookmark then next end
+				url,filename = $1,$2
+				@content.push([filename.gsub("mid","org"), url.gsub("/mid","/org")])
+			end
+		}
+		sleep(@sleep)
+		return true
 	end
 
 	def search_first(arg,bookmark,fast,filter)
@@ -90,20 +105,42 @@ class Picrawler::Fg
 		@seek_end=false
 
 		@page=0
-		ret=tag_next
-		if ret then puts 'Browsing http://www.fg-site.net/contents/search/sort:created/direction:desc/word:'+arg+'/' end #page:x
+		ret=search_next
+		if ret then puts 'Browsing http://www.fg-site.net/contents/search/sort:created/direction:desc/word:'+arg+'/' end
 		return ret
 	end
 
 	def search_next
+		@page+=1
+		if @seek_end then return false end
+		begin
+			@agent.get('http://www.fg-site.net/contents/search/sort:created/direction:desc/word:'+@arg.uriEncode+'/page:'+@page.to_s)
+		rescue
+			return false
+		end
+
+		unless @agent.page.body.resolve=~/次の20件/ then @seek_end=true end ###
+		@content=[]
+		array=@agent.page.body.resolve.split("<a href=\"http://www.fg-site.net/products/")
+		array.shift
+		array.each{|e|
+			if e=~/.+?(http\:\/\/image.+?\.fg-site\.net\/image\/mid\/\d+\/(.+?\.(jpeg|jpg|png|gif)))/m
+				if @bookmark>0 && bookmark<@bookmark then next end
+				url,filename = $1,$2
+				@content.push([filename.gsub("mid","org"), url.gsub("/mid","/org")])
+			end
+		}
+		sleep(@sleep)
+		return true
 	end
 
 	def crawl
-		@content.each_with_index{|e,i|
-			if @filter.include?(File.basename(e,".*"))
+		@content.each_with_index{|e,i| # e[0] -> filename, e[1] -> URL
+			if @filter.include?(File.basename(e[0],".*"))
 				if @fast then @seek_end=true end
 			else
-				###
+				@agent.get(e[1], [], 'http://www.fg-site.net/') #2.1 syntax
+				@agent.page.save_as(e[0]) #as file is written after obtaining whole file, it should be less dangerous.
 				sleep(@sleep)
 			end
 			printf("Page %d %d/%d    \r",@page,i+1,@content.length) 
