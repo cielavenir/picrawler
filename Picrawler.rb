@@ -264,7 +264,7 @@ class Picrawler
 	end
 
 	#dynamic loading
-	def call_first(mode,id,bookmark,fast,filter) return @pic.send(mode+"_first",id,bookmark,fast,filter) end
+	def call_first(mode,id,bookmark,fast,filter,start,stop) return @pic.send(mode+"_first",id,bookmark,fast,filter,start,stop) end
 	def call_next(mode) return @pic.send(mode+"_next") end
 
 	def crawl() return @pic.crawl end

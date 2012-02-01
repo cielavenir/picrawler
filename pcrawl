@@ -19,6 +19,8 @@ pic=Picrawler.new(File.expand_path("Picrawler.ini"))
 dir=nil
 bookmark=0
 fast=false
+start=1
+stop=-1
 mode=nil
 OptionParser.new{|opt| #todo: trap Exception and show message in proper way
 	opt.banner=
@@ -31,6 +33,8 @@ OptionParser.new{|opt| #todo: trap Exception and show message in proper way
 	#opt.on('-t VAL','--tag','illust tag'){|v| tag=v}
 	opt.on('-d VAL','--dir','save dir'){|v| dir=v}
 	opt.on('-b VAL','--bookmark','bookmark number'){|v| bookmark=v.to_i}
+	opt.on('-s VAL','--start','starting page (>=1)'){|v| start=v.to_i;if start<1 then raise "starting page must be 1 or bigger" end}
+	opt.on('-e VAL','--end','ending page'){|v| stop=v.to_i}
 	opt.on('-f','--fast','fast mode: stops immediately when duplicated'){|v| fast=true}
 	opt.on('-h','--help','show this message'){|v| puts "Picrawler"+" "+Version;puts opt;exit}
 	opt.on('-v','--version','print version'){|v| puts "Picrawler"+" "+Version;exit} #File.basename($0)
@@ -39,6 +43,7 @@ OptionParser.new{|opt| #todo: trap Exception and show message in proper way
 	#if mode.length==0 then raise "SITE is mandatory." end
 	if mode.length==1 then pic.mode_list(mode[0]).each{|e| puts e};exit end
 	if mode.length!=3 then raise "COMMAND -> SITE MODE ARG" end
+	if stop>=0 && start>stop then "Not fulfilling: starting page <= ending page" end
 }
 
 unless pic.open(mode[0]) then exit end
@@ -55,7 +60,7 @@ begin
 	}
 rescue; end
 
-unless pic.call_first(mode[1],mode[2],bookmark,fast,filter)
+unless pic.call_first(mode[1],mode[2],bookmark,fast,filter,start,stop)
 	puts "Failed to retrive first page (perhaps not found)"
 	exit
 end

@@ -138,7 +138,7 @@ class Picrawler::Readme
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter) #Initialize variables then call next
+	def member_first(arg,bookmark,fast,filter,start,stop) #Initialize variables then call next
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -146,7 +146,8 @@ class Picrawler::Readme
 		@filter=filter
 		@seek_end=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=member_next
 		if ret then puts 'Browsing '+arg end
 		return ret
@@ -155,7 +156,7 @@ class Picrawler::Readme
 	def member_next #HTML Parser
 	end
 
-	def tag_first(arg,bookmark,fast,filter)
+	def tag_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -163,7 +164,8 @@ class Picrawler::Readme
 		@filter=filter
 		@seek_end=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=tag_next
 		if ret then puts 'Browsing '+arg end
 		return ret

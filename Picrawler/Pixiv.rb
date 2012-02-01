@@ -58,7 +58,7 @@ class Picrawler::Pixiv
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter)
+	def member_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -67,13 +67,15 @@ class Picrawler::Pixiv
 		@seek_end=false
 		@novel=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=member_next
 		if ret then puts 'Browsing http://www.pixiv.net/member_illust.php?id='+arg end
 		return ret
 	end
 
 	def member_next
+		if @page==@stop then return false end
 		@page+=1
 		if @seek_end then return false end
 		begin
@@ -100,7 +102,7 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def novel_first(arg,bookmark,fast,filter)
+	def novel_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -109,13 +111,15 @@ class Picrawler::Pixiv
 		@seek_end=false
 		@novel=true
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=novel_next
 		if ret then puts 'Browsing http://www.pixiv.net/novel/member.php?id='+arg end
 		return ret
 	end
 
 	def novel_next
+		if @page==@stop then return false end
 		@page+=1
 		if @seek_end then return false end
 		begin
@@ -140,7 +144,7 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def tag_first(arg,bookmark,fast,filter)
+	def tag_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -149,13 +153,15 @@ class Picrawler::Pixiv
 		@seek_end=false
 		@novel=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=tag_next
 		if ret then puts 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&word='+arg end
 		return ret
 	end
 
 	def tag_next
+		if @page==@stop then return false end
 		@page+=1
 		if @seek_end then return false end
 		begin
@@ -182,7 +188,7 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def tagillust_first(arg,bookmark,fast,filter)
+	def tagillust_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -191,13 +197,15 @@ class Picrawler::Pixiv
 		@seek_end=false
 		@novel=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=tagillust_next
 		if ret then puts 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&manga=0&word='+arg end
 		return ret
 	end
 
 	def tagillust_next
+		if @page==@stop then return false end
 		@page+=1
 		if @seek_end then return false end
 		begin
@@ -224,7 +232,7 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def tagcomic_first(arg,bookmark,fast,filter)
+	def tagcomic_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -233,13 +241,15 @@ class Picrawler::Pixiv
 		@seek_end=false
 		@novel=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=tagcomic_next
 		if ret then puts 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&manga=1&word='+arg end
 		return ret
 	end
 
 	def tagcomic_next
+		if @page==@stop then return false end
 		@page+=1
 		if @seek_end then return false end
 		begin
@@ -266,7 +276,7 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def tagnovel_first(arg,bookmark,fast,filter)
+	def tagnovel_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -275,13 +285,15 @@ class Picrawler::Pixiv
 		@seek_end=false
 		@novel=true
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=tagnovel_next
 		if ret then puts 'Browsing http://www.pixiv.net/novel/search.php?s_mode=s_tag&word='+arg end
 		return ret
 	end
 
 	def tagnovel_next
+		if @page==@stop then return false end
 		@page+=1
 		if @seek_end then return false end
 		begin
@@ -339,10 +351,12 @@ class Picrawler::Pixiv
 						rescue #normal
 							url_comic=e[1].gsub("_s","_p0")
 							big=false
+							# *** if exception is thown here, something is really wrong. ***
 							@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
 							@agent.page.save_as(e[0]+"/"+e[0]+"_p0."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
 							sleep(@sleep)
 						end
+						printf("Page %d %d/%d Comic 0\r",@page,i+1,@content.length)
 						
 						begin #start
 							j=0
@@ -352,7 +366,7 @@ class Picrawler::Pixiv
 								@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
 								@agent.page.save_as(e[0]+"/"+e[0]+(big ? "_big":"")+"_p"+j.to_s+"."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
 								sleep(@sleep)
-								printf("Page %d %d/%d Comic %d\r",@page,i+1,@content.length,j) 
+								printf("Page %d %d/%d Comic %d\r",@page,i+1,@content.length,j)
 							end
 						rescue; end
 					end

@@ -57,7 +57,7 @@ class Picrawler::NicoSeiga
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter)
+	def member_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -65,13 +65,15 @@ class Picrawler::NicoSeiga
 		@filter=filter
 		@seek_end=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=member_next
 		if ret then puts 'Browsing http://seiga.nicovideo.jp/user/illust/'+arg end
 		return ret
 	end
 
 	def member_next
+		if @page==@stop then return false end
 		@page+=1
 		if @seek_end then return false end
 		begin
@@ -98,7 +100,7 @@ class Picrawler::NicoSeiga
 		return true
 	end
 
-	def tag_first(arg,bookmark,fast,filter)
+	def tag_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -106,13 +108,15 @@ class Picrawler::NicoSeiga
 		@filter=filter
 		@seek_end=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=tag_next
 		if ret then puts 'Browsing http://seiga.nicovideo.jp/tag/'+arg end
 		return ret
 	end
 
 	def tag_next
+		if @page==@stop then return false end
 		@page+=1
 		if @seek_end then return false end
 		begin

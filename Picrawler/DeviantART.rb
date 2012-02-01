@@ -59,7 +59,7 @@ class Picrawler::DeviantART
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter)
+	def member_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -67,13 +67,15 @@ class Picrawler::DeviantART
 		@filter=filter
 		@seek_end=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=member_next
 		if ret then puts 'Browsing http://'+arg+'.deviantart.com/gallery/?catpath=/' end
 		return ret
 	end
 
 	def member_next
+		if @page==@stop then return false end
 		if @seek_end then return false end
 		begin
 			@agent.get('http://'+@arg+'.deviantart.com/gallery/?catpath=/&offset='+(@page*24).to_s)
@@ -97,7 +99,7 @@ class Picrawler::DeviantART
 		return true
 	end
 
-	def search_first(arg,bookmark,fast,filter)
+	def search_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -105,13 +107,15 @@ class Picrawler::DeviantART
 		@filter=filter
 		@seek_end=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=search_next
 		if ret then puts 'Browsing http://browse.deviantart.com/?order=5&q='+arg end
 		return ret
 	end
 
 	def search_next
+		if @page==@stop then return false end
 		if @seek_end then return false end
 		begin
 			@agent.get('http://browse.deviantart.com/?order=5&q='+@arg.uriEncode+'&offset='+(@page*24).to_s)

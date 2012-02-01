@@ -14,7 +14,7 @@ require File.expand_path(File.dirname(__FILE__)+"/Pixiv.rb")
 class Picrawler::Pixiv_R18_example < Picrawler::Pixiv
 	def list() return super+["tag_R18"] end
 
-	def tag_R18_first(arg,bookmark,fast,filter)
+	def tag_R18_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -23,13 +23,15 @@ class Picrawler::Pixiv_R18_example < Picrawler::Pixiv
 		@seek_end=false
 		@novel=false
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=tag_R18_next
 		if ret then puts 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&r18=1&word='+arg end
 		return ret
 	end
 
 	def tag_R18_next
+		if @page==@stop then return false end
 		@page+=1
 		if @seek_end then return false end
 		begin

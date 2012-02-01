@@ -49,7 +49,7 @@ class Picrawler::Tinami
 		@type=1
 	end
 
-	def list() return [] end
+	def list() return ["member","tag"] end
 
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
@@ -72,7 +72,7 @@ class Picrawler::Tinami
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter)
+	def member_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -81,13 +81,15 @@ class Picrawler::Tinami
 		@seek_end=false
 		@type=1
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=member_next
 		if ret then puts 'Browsing http://www.tinami.com/search/list?sort=new&type[]=1&prof_id='+arg end
 		return ret
 	end
 
 	def member_next
+		if @page==@stop then return false end
 		if @seek_end then return false end
 		begin
 			@agent.get('http://www.tinami.com/search/list?sort=new&type[]=1&prof_id='+@arg+'&offset='+(@page*20).to_s)
@@ -111,7 +113,7 @@ class Picrawler::Tinami
 		return true
 	end
 
-	def tag_first(arg,bookmark,fast,filter)
+	def tag_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
@@ -120,13 +122,15 @@ class Picrawler::Tinami
 		@seek_end=false
 		@type=1
 
-		@page=0
+		@page=start-1
+		@stop=stop
 		ret=tag_next
 		if ret then puts 'Browsing http://www.tinami.com/search/list?sort=new&type[]=1&keyword='+arg end
 		return ret
 	end
 
 	def tag_next
+		if @page==@stop then return false end
 		if @seek_end then return false end
 		begin
 			@agent.get('http://www.tinami.com/search/list?sort=new&type[]=1&keyword='+@arg.uriEncode+'&offset='+(@page*20).to_s)
