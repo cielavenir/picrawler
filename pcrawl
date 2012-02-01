@@ -8,7 +8,7 @@ picrawler_gateway_path="Picrawler.rb" ###
 require "optparse"
 require "fileutils"
 
-Version = "0.01.120128"
+Version = "0.03.120201"
 STDOUT.sync = true
 Dir.chdir(File.dirname(__FILE__))
 
