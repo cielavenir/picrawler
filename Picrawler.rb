@@ -178,6 +178,16 @@ if RUBY_VERSION < '1.9.0' then
 		end
 	end
 end
+
+class Hash
+	def exists_rec?(a)
+		#if a.length<1 then return false
+		if !self.include?(a[0]) then return nil end           #if not found
+		if a.length==1 then return self[a[0]] end             #if found and last
+		if !self[a[0]].instance_of?(Hash) then return nil end #if not last and child not hash
+		return self[a[0]].exists_rec?(a[1..-1])               #check child
+	end
+end
 ###Libraries end
 
 require "fileutils"

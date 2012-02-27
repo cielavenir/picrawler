@@ -54,7 +54,7 @@ class Picrawler::Tinami
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar["www.tinami.com"]
+			if @agent.cookie_jar.jar.exists_rec?(["www.tinami.com","/","vid"]) && @agent.cookie_jar.jar.exists_rec?(["www.tinami.com","/","rem2"])
 				unless @agent.cookie_jar.jar["www.tinami.com"]["/"]["vid"].expired? || @agent.cookie_jar.jar["www.tinami.com"]["/"]["rem2"].expired? then return 1 end #use cookie
 			end
 		end

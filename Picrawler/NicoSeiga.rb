@@ -39,7 +39,7 @@ class Picrawler::NicoSeiga
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar["nicovideo.jp"]
+			if @agent.cookie_jar.jar.exists_rec?(["nicovideo.jp","/","user_session"])
 				unless @agent.cookie_jar.jar["nicovideo.jp"]["/"]["user_session"].expired? then return 1 end #use cookie
 			end
 		end

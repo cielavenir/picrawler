@@ -8,7 +8,7 @@ picrawler_gateway_path="Picrawler.rb" ###
 require "optparse"
 require "fileutils"
 
-Version = "0.03.120201"
+Version = "0.04.120227"
 STDOUT.sync = true
 Dir.chdir(File.dirname(__FILE__))
 
@@ -67,3 +67,4 @@ end
 begin
 	pic.crawl
 end while pic.call_next(mode[1])
+puts

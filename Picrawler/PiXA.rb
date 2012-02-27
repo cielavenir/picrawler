@@ -38,7 +38,7 @@ class Picrawler::PiXA
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar["www.pixa.cc"]
+			if @agent.cookie_jar.jar.exists_rec?(["www.pixa.cc","/","auth_token"])
 				unless @agent.cookie_jar.jar["www.pixa.cc"]["/"]["auth_token"].expired? then return 1 end #use cookie
 			end
 		end

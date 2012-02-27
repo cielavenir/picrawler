@@ -53,6 +53,12 @@ Added Danbooru/DeviantART support.
 Fixed PiXA paging.
 Temporary supports Fg.
 Added very experimental Tinami support. only illust search is available.
+0.03.120201
+Added Gelbooru support.
+Added -s(--start) and -e(--end) options.
+0.04.120227
+Fixed expired cookie handling.
+Puts new line when execution ends.
 
 [Creative Commons CC0]
 Statement of Purpose
@@ -120,7 +126,7 @@ class Picrawler::Readme
 
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar["xxx"]
+			if @agent.cookie_jar.jar.exists_rec?(["xxx","/","xxx"])
 				unless @agent.cookie_jar.jar["xxx"]["/"]["xxx"].expired? then return 1 end #use cookie
 			end
 		end

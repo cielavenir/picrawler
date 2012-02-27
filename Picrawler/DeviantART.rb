@@ -41,7 +41,7 @@ class Picrawler::DeviantART
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar["deviantart.com"]
+			if @agent.cookie_jar.jar.exists_rec?(["deviantart.com","/","auth"])
 				unless @agent.cookie_jar.jar["deviantart.com"]["/"]["auth"].expired? then return 1 end #use cookie
 			end
 		end
