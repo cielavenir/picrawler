@@ -51,3 +51,7 @@ user=
 pass=
 savedir=
 sleep=3
+
+;Flickr doesn't need registration
+[Flickr]
+sleep=2

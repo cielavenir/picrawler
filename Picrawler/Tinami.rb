@@ -181,7 +181,7 @@ class Picrawler::Tinami
 				else
 					raise "Type "+@type.to_s+" not implemented!"
 			end
-			printf("Page %d %d/%d    \r",@page,i+1,@content.length) 
+			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

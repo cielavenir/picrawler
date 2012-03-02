@@ -59,6 +59,8 @@ Added -s(--start) and -e(--end) options.
 0.04.120227
 Fixed expired cookie handling.
 Puts new line when execution ends.
+0.05.120302
+Added Flickr support.
 
 [Creative Commons CC0]
 Statement of Purpose
@@ -188,7 +190,7 @@ class Picrawler::Readme
 				###
 				sleep(@sleep)
 			end
-			printf("Page %d %d/%d    \r",@page,i+1,@content.length) 
+			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

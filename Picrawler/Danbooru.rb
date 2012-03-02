@@ -96,6 +96,16 @@ class Picrawler::Danbooru
 			return false
 		end
 
+		if @agent.page.body.resolve=~/span id="cntdwn"/
+			printf("Advertised...\r")
+			sleep(10)
+			begin
+				@agent.get('http://danbooru.donmai.us/post?tags='+@arg.uriEncode+'&page='+@page.to_s)
+			rescue
+				return false
+			end
+		end
+
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
 		array=@agent.page.body.resolve.split("<a href=\"/post/show/")
@@ -137,7 +147,7 @@ class Picrawler::Danbooru
 					#search next ext.
 				}
 			end
-			printf("Page %d %d/%d    \r",@page,i+1,@content.length) 
+			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

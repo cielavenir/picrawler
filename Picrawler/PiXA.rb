@@ -237,7 +237,7 @@ class Picrawler::PiXA
 				@agent.page.save_as(e[0]) #as file is written after obtaining whole file, it should be less dangerous.
 				sleep(@sleep)
 			end
-			printf("Page %d %d/%d    \r",@page,i+1,@content.length) 
+			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

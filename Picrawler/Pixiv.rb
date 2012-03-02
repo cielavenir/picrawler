@@ -371,7 +371,7 @@ class Picrawler::Pixiv
 						rescue; end
 					end
 				end
-				printf("Page %d %d/%d              \r",@page,i+1,@content.length) 
+				printf("Page %d %d/%d              \r",@page,i+1,@content.length)
 			}
 		end
 	end

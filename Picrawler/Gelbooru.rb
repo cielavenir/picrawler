@@ -96,6 +96,16 @@ class Picrawler::Gelbooru
 			return false
 		end
 
+		if @agent.page.body.resolve=~/span id="cntdwn"/
+			printf("Advertised...\r")
+			sleep(10)
+			begin
+				@agent.get('http://gelbooru.com/index.php?page=post&s=list&tags='+@arg.uriEncode+'&pid='+(@page*28).to_s)
+			rescue
+				return false
+			end
+		end
+
 		unless @agent.page.body.resolve=~/ alt="next"\>/ then @seek_end=true end
 		@content=[]
 		array=@agent.page.body.resolve.split("<a id=\"p")
