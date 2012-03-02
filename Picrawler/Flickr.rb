@@ -39,7 +39,7 @@ class Picrawler::Flickr
 		return 1 #always success without login
 	end
 
-	def tag_first(arg,bookmark,fast,filter,start,stop)
+	def member_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
 		if @bookmark==nil then @bookmark=0 end
