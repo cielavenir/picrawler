@@ -1,7 +1,7 @@
 #coding:utf-8
 
 #Picrawler under CC0
-#Picrawler::Danbooru module
+#Picrawler::Flickr module
 
 require "rubygems"
 require "mechanize"
