@@ -337,19 +337,19 @@ class Picrawler::Pixiv
 					if @fast then @seek_end=true end
 				else
 					begin #try illust
-						@agent.get(e[1].gsub("_s",""), [], 'http://www.pixiv.net/') #2.1 syntax
+						@agent.get(e[1].gsub("_s.","."), [], 'http://www.pixiv.net/') #2.1 syntax
 						@agent.page.save_as(e[0]+"."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
 						sleep(@sleep)
 					rescue #try comic
 						Dir.mkdir(e[0])
-						url_comic=e[1].gsub("_s","_big_p0")
+						url_comic=e[1].gsub("_s.","_big_p0.")
 						big=true
 						begin #big
 							@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
 							@agent.page.save_as(e[0]+"/"+e[0]+"_big_p0."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
 							sleep(@sleep)
 						rescue #normal
-							url_comic=e[1].gsub("_s","_p0")
+							url_comic=e[1].gsub("_s.","_p0.")
 							big=false
 							# *** if exception is thown here, something is really wrong. ***
 							@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
@@ -362,7 +362,7 @@ class Picrawler::Pixiv
 							j=0
 							while true
 								j+=1
-								url_comic=url_comic.gsub("_p"+(j-1).to_s,"_p"+j.to_s)
+								url_comic=url_comic.gsub("_p"+(j-1).to_s+".","_p"+j.to_s+".")
 								@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
 								@agent.page.save_as(e[0]+"/"+e[0]+(big ? "_big":"")+"_p"+j.to_s+"."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
 								sleep(@sleep)
