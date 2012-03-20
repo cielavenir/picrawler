@@ -1,7 +1,40 @@
 #coding:utf-8
 
 #Picrawler under CC0
-#Picrawler gateway module (just an example for how to use Picrawler website modules)
+#Picrawler gateway module
+
+require "rubygems"
+require "mechanize"
+require "uri"
+require "fileutils"
+
+class String
+	def resolve #must be called if you use regexp for Mechanize::Page#body
+		if RUBY_VERSION >= '1.9.0' then self.force_encoding("UTF-8") end
+		return self
+	end
+
+	def uriEncode
+		return URI.encode(self)
+	end
+
+	def uriDecode
+		return URI.decode(self)
+	end
+end
+
+if Mechanize::VERSION >= '2.2'
+#It seems save_as method was removed in 2.2... I won't fix directly, for compatibility.
+	class Mechanize::File
+		alias_method :save_as, :save
+	end
+	class Mechanize::Image
+		alias_method :save_as, :save
+	end
+	class Mechanize::Page
+		alias_method :save_as, :save
+	end
+end
 
 ###Libraries
 #Ini Reader/Writer http://d.hatena.ne.jp/white-azalea/20081109/1226244784
@@ -190,7 +223,6 @@ class Hash
 end
 ###Libraries end
 
-require "fileutils"
 class Picrawler
 	def initialize(conf)
 		unless File.exist?(conf)
@@ -210,7 +242,7 @@ class Picrawler
 			@cookie=File.expand_path(@cookie)
 		end
 
-		@service_list=(Dir.glob(File.dirname(__FILE__)+"/Picrawler/*").map{|e| File.basename(e,".*")}-["Readme"]).sort
+		@service_list=(Dir.glob(File.dirname(File.realpath(__FILE__))+"/Picrawler/*").map{|e| File.basename(e,".*")}-["Readme"]).sort
 	end
 	def encoding() return @encoding end
 	def list() return @service_list end
@@ -246,7 +278,7 @@ class Picrawler
 			Dir.chdir(savedir)
 		end
 
-		require File.expand_path( File.dirname(__FILE__)+"/Picrawler/"+service+".rb" )
+		require File.expand_path( File.dirname(File.realpath(__FILE__))+"/Picrawler/"+service+".rb" )
 		@pic=Picrawler.const_get(service).new(@encoding,sleeptime)
 		ret=@pic.open(@ini[service]["user"],@ini[service]["pass"],@cookie)	
 		if ret==-1
@@ -268,7 +300,7 @@ class Picrawler
 			puts "Website module not available (Website module name is case-sensitive)."
 			return []
 		end
-		require File.expand_path( File.dirname(__FILE__)+"/Picrawler/"+service+".rb" )
+		require File.expand_path( File.dirname(File.realpath(__FILE__))+"/Picrawler/"+service+".rb" )
 		@pic=Picrawler.const_get(service).new(@encoding,-1)
 		return @pic.list
 	end

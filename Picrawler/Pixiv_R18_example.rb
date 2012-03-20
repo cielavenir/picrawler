@@ -5,10 +5,6 @@
 
 #Extending example for Pixiv R18
 
-require "rubygems"
-require "mechanize"
-require "uri"
-
 require File.expand_path(File.dirname(__FILE__)+"/Pixiv.rb")
 
 class Picrawler::Pixiv_R18_example < Picrawler::Pixiv

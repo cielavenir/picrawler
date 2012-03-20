@@ -4,21 +4,6 @@
 #Picrawler::Fg module
 #bookmark isn't implemented.
 
-require "rubygems"
-require "mechanize"
-require "uri"
-
-class String
-	def resolve #must be called if you use regexp for Mechanize::Page#body
-		if RUBY_VERSION >= '1.9.0' then self.force_encoding("UTF-8") end
-		return self
-	end
-
-	def uriEncode
-		return URI.encode(self)
-	end
-end
-
 class Picrawler::Fg
 	def initialize(encoding,sleep)
 		@agent=Mechanize.new

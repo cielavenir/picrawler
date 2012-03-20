@@ -4,6 +4,8 @@
 #Picrawler::Readme module
 #!!! Not actual module. Just skeleton. Please never try to load this module. !!!
 
+#!!! Don't load site modules directly. Load them via Picrawler.rb gateway. !!!
+
 =begin
 Picrawler under CC0
 An extendable picture website downloader
@@ -61,6 +63,8 @@ Fixed expired cookie handling.
 Puts new line when execution ends.
 0.05.120302
 Added Flickr support.
+0.06.120321
+Working on Mechanize 2.3.
 
 [Creative Commons CC0]
 Statement of Purpose
@@ -90,21 +94,6 @@ b. Affirmer offers the Work as-is and makes no representations or warranties of 
 c. Affirmer disclaims responsibility for clearing rights of other persons that may apply to the Work or any use thereof, including without limitation any person's Copyright and Related Rights in the Work. Further, Affirmer disclaims responsibility for obtaining any necessary consents, permissions or other rights required for any use of the Work.
 d. Affirmer understands and acknowledges that Creative Commons is not a party to this document and has no duty or obligation with respect to this CC0 or use of the Work.
 =end
-
-require "rubygems"
-require "mechanize"
-require "uri"
-
-class String
-	def resolve #must be called if you use regexp for Mechanize::Page#body
-		if RUBY_VERSION >= '1.9.0' then self.force_encoding("UTF-8") end
-		return self
-	end
-
-	def uriEncode
-		return URI.encode(self)
-	end
-end
 
 class Picrawler::Readme
 	def initialize(encoding,sleep)
