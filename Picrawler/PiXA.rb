@@ -23,13 +23,13 @@ class Picrawler::PiXA
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["www.pixa.cc","/","auth_token"])
-				unless @agent.cookie_jar.jar["www.pixa.cc"]["/"]["auth_token"].expired? then return 1 end #use cookie
+			if @agent.cookie_jar.jar.exists_rec?(["www.pixa.cc","/","_imagesns2_session"])
+				unless @agent.cookie_jar.jar["www.pixa.cc"]["/"]["_imagesns2_session"].expired? then return 1 end #use cookie
 			end
 		end
 
 		#normal auth.
-		form = @agent.get('http://www.pixa.cc').forms[1]
+		form = @agent.get('http://www.pixa.cc').form_with(:action=>"/session")
 		form.email = user
 		form.password = pass
 		form.checkbox_with("remember_me").check
@@ -52,7 +52,7 @@ class Picrawler::PiXA
 		@page=start-1
 		@stop=stop
 		ret=member_next
-		if ret then puts 'Browsing http://www.pixa.cc/profiles/show/'+arg end
+		if ret then puts(('Browsing http://www.pixa.cc/profiles/show/'+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -80,6 +80,7 @@ class Picrawler::PiXA
 				@content.push([$1+'.'+$3, $2.gsub("two_thumb","original")])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -95,7 +96,7 @@ class Picrawler::PiXA
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://www.pixa.cc/illustrations/list_tag?tag='+arg end
+		if ret then puts(('Browsing http://www.pixa.cc/illustrations/list_tag?tag='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -123,6 +124,7 @@ class Picrawler::PiXA
 				@content.push([$1+'.'+$3, $2.gsub("two_thumb","original")])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -138,7 +140,7 @@ class Picrawler::PiXA
 		@page=start-1
 		@stop=stop
 		ret=keyword_next
-		if ret then puts 'Browsing http://www.pixa.cc/illustrations/list_search?keyword='+arg end
+		if ret then puts(('Browsing http://www.pixa.cc/illustrations/list_search?keyword='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -166,6 +168,7 @@ class Picrawler::PiXA
 				@content.push([$1+'.'+$3, $2.gsub("two_thumb","original")])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -181,7 +184,7 @@ class Picrawler::PiXA
 		@page=start-1
 		@stop=stop
 		ret=nickname_next
-		if ret then puts 'Browsing http://www.pixa.cc/illustrations/list_nickname?nickname='+arg end
+		if ret then puts(('Browsing http://www.pixa.cc/illustrations/list_nickname?nickname='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -209,6 +212,7 @@ class Picrawler::PiXA
 				@content.push([$1+'.'+$3, $2.gsub("two_thumb","original")])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end

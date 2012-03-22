@@ -9,18 +9,13 @@ require "uri"
 require "fileutils"
 
 class String
-	def resolve #must be called if you use regexp for Mechanize::Page#body
-		if RUBY_VERSION >= '1.9.0' then self.force_encoding("UTF-8") end
+	def resolve2(enc) #must be called if you use regexp for Mechanize::Page#body
+		if RUBY_VERSION >= '1.9.0' then self.force_encoding(enc) end
 		return self
 	end
-
-	def uriEncode
-		return URI.encode(self)
-	end
-
-	def uriDecode
-		return URI.decode(self)
-	end
+	def resolve() return resolve2("UTF-8") end
+	def uriEncode() return URI.encode(self) end 
+	def uriDecode() return URI.decode(self) end
 end
 
 if Mechanize::VERSION >= '2.2'
@@ -189,6 +184,8 @@ if RUBY_VERSION < '1.9.0' then
 						when "SJIS"
 							return Kconv::SJIS
 						when "SHIFT_JIS"
+							return Kconv::SJIS
+						when "Shift_JIS"
 							return Kconv::SJIS
 						when "CP932"
 							return Kconv::SJIS

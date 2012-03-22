@@ -78,6 +78,7 @@ class Picrawler::DeviantART
 			end
 		}
 		@page+=1
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -119,6 +120,7 @@ class Picrawler::DeviantART
 			end
 		}
 		@page+=1
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end

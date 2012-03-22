@@ -22,7 +22,7 @@ class Picrawler::Pixiv_R18_example < Picrawler::Pixiv
 		@page=start-1
 		@stop=stop
 		ret=tag_R18_next
-		if ret then puts 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&r18=1&word='+arg end
+		if ret then puts(('Browsing http://www.pixiv.net/search.php?s_mode=s_tag&r18=1&word='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -50,6 +50,7 @@ class Picrawler::Pixiv_R18_example < Picrawler::Pixiv
 				@content.push([$1, $2, $3])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end

@@ -55,7 +55,7 @@ class Picrawler::Pixiv
 		@page=start-1
 		@stop=stop
 		ret=member_next
-		if ret then puts 'Browsing http://www.pixiv.net/member_illust.php?id='+arg end
+		if ret then puts(('Browsing http://www.pixiv.net/member_illust.php?id='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -83,6 +83,7 @@ class Picrawler::Pixiv
 				@content.push([$1, $2, $3])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -99,7 +100,7 @@ class Picrawler::Pixiv
 		@page=start-1
 		@stop=stop
 		ret=novel_next
-		if ret then puts 'Browsing http://www.pixiv.net/novel/member.php?id='+arg end
+		if ret then puts(('Browsing http://www.pixiv.net/novel/member.php?id='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -125,6 +126,7 @@ class Picrawler::Pixiv
 				@content.push($1)
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -141,7 +143,7 @@ class Picrawler::Pixiv
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&word='+arg end
+		if ret then puts(('Browsing http://www.pixiv.net/search.php?s_mode=s_tag&word='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -169,6 +171,7 @@ class Picrawler::Pixiv
 				@content.push([$1, $2, $3])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -185,7 +188,7 @@ class Picrawler::Pixiv
 		@page=start-1
 		@stop=stop
 		ret=tagillust_next
-		if ret then puts 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&manga=0&word='+arg end
+		if ret then puts(('Browsing http://www.pixiv.net/search.php?s_mode=s_tag&manga=0&word='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -213,6 +216,7 @@ class Picrawler::Pixiv
 				@content.push([$1, $2, $3])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -229,7 +233,7 @@ class Picrawler::Pixiv
 		@page=start-1
 		@stop=stop
 		ret=tagcomic_next
-		if ret then puts 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&manga=1&word='+arg end
+		if ret then puts(('Browsing http://www.pixiv.net/search.php?s_mode=s_tag&manga=1&word='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -257,6 +261,7 @@ class Picrawler::Pixiv
 				@content.push([$1, $2, $3])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -273,7 +278,7 @@ class Picrawler::Pixiv
 		@page=start-1
 		@stop=stop
 		ret=tagnovel_next
-		if ret then puts 'Browsing http://www.pixiv.net/novel/search.php?s_mode=s_tag&word='+arg end
+		if ret then puts(('Browsing http://www.pixiv.net/novel/search.php?s_mode=s_tag&word='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -299,6 +304,7 @@ class Picrawler::Pixiv
 				@content.push($1)
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end

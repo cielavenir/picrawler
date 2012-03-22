@@ -8,7 +8,7 @@ picrawler_gateway_path="Picrawler.rb" ###
 require "optparse"
 require "fileutils"
 
-Version = "0.06.120321"
+Version = "0.07.120322"
 STDOUT.sync = true
 Dir.chdir(File.dirname(__FILE__))
 
@@ -47,7 +47,7 @@ OptionParser.new{|opt| #todo: trap Exception and show message in proper way
 }
 
 unless pic.open(mode[0]) then exit end
-if dir==nil then dir=mode[2] end
+if dir==nil then dir=mode[2].dup end #need to use dup...
 dir.encode!(pic.encoding,"UTF-8")
 FileUtils.mkpath(dir)
 Dir.chdir(dir)

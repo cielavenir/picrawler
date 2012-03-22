@@ -67,7 +67,7 @@ class Picrawler::Danbooru
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://danbooru.donmai.us/post?tags=user:'+arg end
+		if ret then puts(('Browsing http://danbooru.donmai.us/post?tags=user:'+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -82,7 +82,7 @@ class Picrawler::Danbooru
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://danbooru.donmai.us/post?tags='+arg end
+		if ret then puts(('Browsing http://danbooru.donmai.us/post?tags='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -123,6 +123,7 @@ class Picrawler::Danbooru
 				@content.push([$1, $2])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end

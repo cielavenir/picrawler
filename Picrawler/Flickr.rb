@@ -35,7 +35,7 @@ class Picrawler::Flickr
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://www.flickr.com/photos/'+@arg end
+		if ret then puts(('Browsing http://www.flickr.com/photos/'+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -60,6 +60,7 @@ class Picrawler::Flickr
 				@content.push("http://www.flickr.com/photos/"+$1+"/sizes/o/in/photostream/")
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -75,7 +76,7 @@ class Picrawler::Flickr
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://www.flickr.com/search/?w=all&mt=photos&ct=5&m=tags&q='+arg end
+		if ret then puts(('Browsing http://www.flickr.com/search/?w=all&mt=photos&ct=5&m=tags&q='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -100,6 +101,7 @@ class Picrawler::Flickr
 				@content.push("http://www.flickr.com/photos/"+$1+"sizes/o/in/photostream/")
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -115,7 +117,7 @@ class Picrawler::Flickr
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://www.flickr.com/search/?w=all&mt=photos&ct=5&m=text&q='+arg end
+		if ret then puts(('Browsing http://www.flickr.com/search/?w=all&mt=photos&ct=5&m=text&q='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -140,6 +142,7 @@ class Picrawler::Flickr
 				@content.push("http://www.flickr.com/photos/"+$1+"sizes/o/in/photostream/")
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end

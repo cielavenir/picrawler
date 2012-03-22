@@ -20,7 +20,7 @@ mechanize (C) Michael Neumann / Aaron Patterson / Mike Dalessio / Eric Hodel / A
 [Note] website modules encoded in other than UTF-8 must encode strings properly or you will get wrong result.
 [Note] Cookie YAML cannot be merged between 1.8.x and 1.9.x.
 
-### You need Ruby 1.8.7 / 1.9.1 and Mechanize 2.1 or later. ###
+### You need Ruby 1.8.7 / 1.9.2 and Mechanize 2.1 or later. ###
 ### Sorry, but I use Mechanize#get 2.1 syntax.              ###
 As for specifying encoding in Ruby1.8, there should be several cases. Please be aware :p
 #Ruby 1.9.x (Debian/Ubuntu)
@@ -37,7 +37,7 @@ sudo gem install mechanize
 [Debian/Ubuntu]
 sudo apt-get install libxml2-dev libxslt1-dev
 sudo apt-get install ruby1.9.1
-sudo gem1.9.1 install mechanize #apt will install 1.0; not suitable
+sudo apt-get install ruby-mechanize
 
 [History]
 0.00A1.120125
@@ -65,6 +65,11 @@ Puts new line when execution ends.
 Added Flickr support.
 0.06.120321
 Working on Mechanize 2.3.
+0.07.120322
+Added Piapro support.
+Updated PiXA cookie handling.
+Updated Gelbooru for module 0.2.5.
+Fixed fatal bug that pcrawl frontend won't work on non-UTF8 environments unless -d is used.
 
 [Creative Commons CC0]
 Statement of Purpose
@@ -146,7 +151,7 @@ class Picrawler::Readme
 		@page=start-1
 		@stop=stop
 		ret=member_next
-		if ret then puts 'Browsing '+arg end
+		if ret then puts(('Browsing '+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -164,7 +169,7 @@ class Picrawler::Readme
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing '+arg end
+		if ret then puts(('Browsing '+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 

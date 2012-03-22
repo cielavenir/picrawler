@@ -53,7 +53,7 @@ class Picrawler::Fg
 		@page=start-1
 		@stop=stop
 		ret=member_next
-		if ret then puts 'Browsing http://www.fg-site.net/contents/view/user_id:'+arg+'/' end
+		if ret then puts(('Browsing http://www.fg-site.net/contents/view/user_id:'+arg+'/').encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -79,6 +79,7 @@ class Picrawler::Fg
 				@content.push([filename.gsub("mid","org"), url.gsub("/mid","/org")])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -94,7 +95,7 @@ class Picrawler::Fg
 		@page=start-1
 		@stop=stop
 		ret=search_next
-		if ret then puts 'Browsing http://www.fg-site.net/contents/search/sort:created/direction:desc/word:'+arg+'/' end
+		if ret then puts(('Browsing http://www.fg-site.net/contents/search/sort:created/direction:desc/word:'+arg+'/').encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -119,6 +120,7 @@ class Picrawler::Fg
 				@content.push([filename.gsub("mid","org"), url.gsub("/mid","/org")])
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end

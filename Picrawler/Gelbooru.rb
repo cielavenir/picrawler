@@ -53,7 +53,7 @@ class Picrawler::Gelbooru
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://gelbooru.com/index.php?page=post&s=list&tags=user:'+arg end
+		if ret then puts(('Browsing http://gelbooru.com/index.php?page=post&s=list&tags=user:'+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -68,7 +68,7 @@ class Picrawler::Gelbooru
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://gelbooru.com/index.php?page=post&s=list&tags='+arg end
+		if ret then puts(('Browsing http://gelbooru.com/index.php?page=post&s=list&tags='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -97,12 +97,14 @@ class Picrawler::Gelbooru
 		array.shift
 		array.each{|e|
 			bookmark=0
-			if e=~/(\d+).+?(http\:\/\/img.+?\.gelbooru\.com\/thumbs\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
+			#if e=~/(\d+).+?(http\:\/\/img.+?\.gelbooru\.com\/thumbs\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
+			if e=~/(\d+).+?(http\:\/\/gelbooru\.com\/thumbs\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push([$1+'.'+$3, $2.sub("/thumbnail_","/").sub("/thumbs/","/images/")])
 			end
 		}
 		@page+=1
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end

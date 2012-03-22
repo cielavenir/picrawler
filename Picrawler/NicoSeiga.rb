@@ -53,7 +53,7 @@ class Picrawler::NicoSeiga
 		@page=start-1
 		@stop=stop
 		ret=member_next
-		if ret then puts 'Browsing http://seiga.nicovideo.jp/user/illust/'+arg end
+		if ret then puts(('Browsing http://seiga.nicovideo.jp/user/illust/'+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -81,6 +81,7 @@ class Picrawler::NicoSeiga
 				@content.push($1)
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -96,7 +97,7 @@ class Picrawler::NicoSeiga
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://seiga.nicovideo.jp/tag/'+arg end
+		if ret then puts(('Browsing http://seiga.nicovideo.jp/tag/'+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -124,6 +125,7 @@ class Picrawler::NicoSeiga
 				@content.push($1)
 			end
 		}
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -136,7 +138,7 @@ class Picrawler::NicoSeiga
 				@agent.get("http://seiga.nicovideo.jp/image/source?id="+e, [], 'http://seiga.nicovideo.jp/') #2.1 syntax
 				ext=""
 				if @agent.page.response["content-type"]=="image/jpeg"
-					ext=".jpg" 
+					ext=".jpg"
 				elsif @agent.page.response["content-type"]=="image/png"
 					ext=".png"
 				elsif @agent.page.response["content-type"]=="image/gif"

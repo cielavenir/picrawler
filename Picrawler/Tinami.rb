@@ -69,7 +69,7 @@ class Picrawler::Tinami
 		@page=start-1
 		@stop=stop
 		ret=member_next
-		if ret then puts 'Browsing http://www.tinami.com/search/list?sort=new&type[]=1&prof_id='+arg end
+		if ret then puts(('Browsing http://www.tinami.com/search/list?sort=new&type[]=1&prof_id='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -94,6 +94,7 @@ class Picrawler::Tinami
 			end
 		}
 		@page+=1
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end
@@ -110,7 +111,7 @@ class Picrawler::Tinami
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts 'Browsing http://www.tinami.com/search/list?sort=new&type[]=1&keyword='+arg end
+		if ret then puts(('Browsing http://www.tinami.com/search/list?sort=new&type[]=1&keyword='+arg).encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -135,6 +136,7 @@ class Picrawler::Tinami
 			end
 		}
 		@page+=1
+		if @content.length<1 then return false end
 		sleep(@sleep)
 		return true
 	end

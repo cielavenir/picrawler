@@ -34,6 +34,12 @@ pass=
 savedir=
 sleep=3
 
+[Piapro]
+user=
+pass=
+savedir=
+sleep=2
+
 [PiXA]
 user=
 pass=
