@@ -139,8 +139,8 @@ class Picrawler::Minitokyo
 				@agent.get("http://static.minitokyo.net/downloads/"+e, [], 'http://gallery.minitokyo.net/') #2.1 syntax
 				@agent.page.save_as(File.basename(e)) #as file is written after obtaining whole file, it should be less dangerous.
 				sleep(@sleep)
-				printf("Page %d %d/%d    \r",@page,i+1,@content.length)
 			end
+			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

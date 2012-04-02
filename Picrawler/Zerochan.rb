@@ -138,8 +138,8 @@ class Picrawler::Zerochan
 				@agent.get("http://static.zerochan.net/full/"+e, [], 'http://www.zerochan.net/') #2.1 syntax
 				@agent.page.save_as(File.basename(e)) #as file is written after obtaining whole file, it should be less dangerous.
 				sleep(@sleep)
-				printf("Page %d %d/%d    \r",@page,i+1,@content.length)
 			end
+			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end
