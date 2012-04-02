@@ -43,7 +43,7 @@ class Picrawler::Piapro
 		form.login_email = user
 		form.login_password = pass
 		form.checkbox_with("auto_login").check
-		if @agent.submit(form).body.resolve2("CP932") =~ /ログアウト/
+		if @agent.submit(form).body.resolve("CP932") =~ /ログアウト/
 			@agent.cookie_jar.save_as(cookie)
 			return 0
 		end
@@ -116,12 +116,12 @@ class Picrawler::Piapro
 		@page+=1
 
 		if
-			@agent.page.body.resolve2("CP932")=~/\<li\>\<span class="dum page_navi_sp"\>NEXT&nbsp;&gt;&gt;\<\/span\>\<\/li\>/ || 
-			!(@agent.page.body.resolve2("CP932")=~/"\>NEXT&nbsp;&gt;&gt;\<\/a\>\<\/li\>/) #only 1 page
+			@agent.page.body.resolve("CP932")=~/\<li\>\<span class="dum page_navi_sp"\>NEXT&nbsp;&gt;&gt;\<\/span\>\<\/li\>/ || 
+			!(@agent.page.body.resolve("CP932")=~/"\>NEXT&nbsp;&gt;&gt;\<\/a\>\<\/li\>/) #only 1 page
 		@seek_end=true end
 
 		@content=[]
-		array=@agent.page.body.resolve2("CP932").split(" style=\"background:url")
+		array=@agent.page.body.resolve("CP932").split(" style=\"background:url")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -203,12 +203,12 @@ class Picrawler::Piapro
 		@page+=1
 
 		if
-			@agent.page.body.resolve2("CP932")=~/\<li\>\<span class="dum page_navi_sp"\>NEXT&nbsp;&gt;&gt;\<\/span\>\<\/li\>/ || 
-			!(@agent.page.body.resolve2("CP932")=~/"\>NEXT&nbsp;&gt;&gt;\<\/a\>\<\/li\>/) #only 1 page
+			@agent.page.body.resolve("CP932")=~/\<li\>\<span class="dum page_navi_sp"\>NEXT&nbsp;&gt;&gt;\<\/span\>\<\/li\>/ || 
+			!(@agent.page.body.resolve("CP932")=~/"\>NEXT&nbsp;&gt;&gt;\<\/a\>\<\/li\>/) #only 1 page
 		@seek_end=true end
 
 		@content=[]
-		array=@agent.page.body.resolve2("CP932").split("<a href=\"javascript:swf_popup_display('")
+		array=@agent.page.body.resolve("CP932").split("<a href=\"javascript:swf_popup_display('")
 		array.shift
 		array.each{|e|
 			bookmark=0

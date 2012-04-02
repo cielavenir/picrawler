@@ -9,11 +9,10 @@ require "uri"
 require "fileutils"
 
 class String
-	def resolve2(enc) #must be called if you use regexp for Mechanize::Page#body
+	def resolve(enc="UTF-8") #must be called if you use regexp for Mechanize::Page#body
 		if RUBY_VERSION >= '1.9.0' then self.force_encoding(enc) end
 		return self
 	end
-	def resolve() return resolve2("UTF-8") end
 	def uriEncode() return URI.encode(self) end 
 	def uriDecode() return URI.decode(self) end
 end
@@ -239,7 +238,7 @@ class Picrawler
 			@cookie=File.expand_path(@cookie)
 		end
 
-		@service_list=(Dir.glob(File.dirname(File.realpath(__FILE__))+"/Picrawler/*").map{|e| File.basename(e,".*")}-["Readme"]).sort
+		@service_list=(Dir.glob(File.dirname(File.realpath(__FILE__))+"/Picrawler/*.rb").map{|e| File.basename(e,".*")}-["Readme"]).sort
 	end
 	def encoding() return @encoding end
 	def list() return @service_list end

@@ -70,6 +70,8 @@ Added Piapro support.
 Updated PiXA cookie handling.
 Updated Gelbooru for module 0.2.5.
 Fixed fatal bug that pcrawl frontend won't work on non-UTF8 environments unless -d is used.
+0.08.120402
+Added Zerochan and Minitokyo (alpha) support.
 
 [Creative Commons CC0]
 Statement of Purpose

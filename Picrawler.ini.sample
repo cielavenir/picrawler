@@ -22,7 +22,17 @@ pass=
 savedir=
 sleep=3
 
+;Flickr doesn't need registration
+[Flickr]
+sleep=2
+
 [Gelbooru]
+user=
+pass=
+savedir=
+sleep=2
+
+[Minitokyo]
 user=
 pass=
 savedir=
@@ -58,6 +68,8 @@ pass=
 savedir=
 sleep=3
 
-;Flickr doesn't need registration
-[Flickr]
+[Zerochan]
+user=
+pass=
+savedir=
 sleep=2
