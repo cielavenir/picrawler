@@ -24,6 +24,7 @@ sleep=3
 
 ;Flickr doesn't need registration
 [Flickr]
+savedir=
 sleep=2
 
 [Gelbooru]
