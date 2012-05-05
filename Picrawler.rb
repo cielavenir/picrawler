@@ -7,6 +7,7 @@ require "rubygems"
 require "mechanize"
 require "uri"
 require "fileutils"
+require "pathname"
 
 class String
 	def resolve(enc="UTF-8") #must be called if you use regexp for Mechanize::Page#body
@@ -217,6 +218,11 @@ class Hash
 		return self[a[0]].exists_rec?(a[1..-1])               #check child
 	end
 end
+
+class String
+	def realpath() return Pathname(self).realpath.to_s end
+	def dirname() return Pathname(self).dirname.to_s end
+end
 ###Libraries end
 
 class Picrawler
@@ -238,7 +244,7 @@ class Picrawler
 			@cookie=File.expand_path(@cookie)
 		end
 
-		@service_list=(Dir.glob(File.dirname(File.realpath(__FILE__))+"/Picrawler/*.rb").map{|e| File.basename(e,".*")}-["Readme"]).sort
+		@service_list=(Dir.glob(__FILE__.realpath.dirname+"/Picrawler/*.rb").map{|e| File.basename(e,".*")}-["Readme"]).sort
 	end
 	def encoding() return @encoding end
 	def list() return @service_list end
@@ -274,7 +280,7 @@ class Picrawler
 			Dir.chdir(savedir)
 		end
 
-		require File.expand_path( File.dirname(File.realpath(__FILE__))+"/Picrawler/"+service+".rb" )
+		require File.expand_path(__FILE__.realpath.dirname+"/Picrawler/"+service+".rb")
 		@pic=Picrawler.const_get(service).new(@encoding,sleeptime)
 		ret=@pic.open(@ini[service]["user"],@ini[service]["pass"],@cookie)	
 		if ret==-1
@@ -296,7 +302,7 @@ class Picrawler
 			puts "Website module not available (Website module name is case-sensitive)."
 			return []
 		end
-		require File.expand_path( File.dirname(File.realpath(__FILE__))+"/Picrawler/"+service+".rb" )
+		require File.expand_path(__FILE__.realpath.dirname+"/Picrawler/"+service+".rb")
 		@pic=Picrawler.const_get(service).new(@encoding,-1)
 		return @pic.list
 	end

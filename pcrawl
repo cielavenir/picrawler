@@ -2,17 +2,19 @@
 #coding:utf-8
 if RUBY_VERSION < '1.9.0' then $KCODE="u" end
 
-picrawler_gateway_path="Picrawler.rb" ###
+Picrawler_gateway_path="Picrawler.rb" ###
 
 ###main
 require "optparse"
 require "fileutils"
 
-Version = "0.08.120402"
+Version = "0.09.120505"
 STDOUT.sync = true
+
+def pcrawl(argv)
 Dir.chdir(File.dirname(__FILE__))
 
-require File.expand_path(picrawler_gateway_path) ### Picrawler module path ###
+require File.expand_path(Picrawler_gateway_path) ### Picrawler module path ###
 pic=Picrawler.new(File.expand_path("Picrawler.ini"))
 
 #parse ARGV
@@ -38,8 +40,8 @@ OptionParser.new{|opt| #todo: trap Exception and show message in proper way
 	opt.on('-f','--fast','fast mode: stops immediately when duplicated'){|v| fast=true}
 	opt.on('-h','--help','show this message'){|v| puts "Picrawler"+" "+Version;puts opt;exit}
 	opt.on('-v','--version','print version'){|v| puts "Picrawler"+" "+Version;exit} #File.basename($0)
-	if ARGV.length==0 then puts "Picrawler"+" "+Version;puts opt;exit end
-	mode=opt.parse(ARGV.map{|e| e.encode("UTF-8",pic.encoding)})
+	if argv.length==0 then puts "Picrawler"+" "+Version;puts opt;exit end
+	mode=opt.parse(argv.map{|e| e.encode("UTF-8",pic.encoding)})
 	#if mode.length==0 then raise "SITE is mandatory." end
 	if mode.length==1 then pic.mode_list(mode[0]).each{|e| puts e};exit end
 	if mode.length!=3 then raise "COMMAND -> SITE MODE ARG" end
@@ -68,3 +70,6 @@ begin
 	pic.crawl
 end while pic.call_next(mode[1])
 puts
+end
+
+if !$0.index("irb") then pcrawl(ARGV) end

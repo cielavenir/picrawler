@@ -5,7 +5,7 @@
 
 #Extending example for Pixiv R18
 
-require File.expand_path(File.dirname(__FILE__)+"/Pixiv.rb")
+require File.expand_path(__FILE__.dirname+"/Pixiv.rb")
 
 class Picrawler::Pixiv_R18_example < Picrawler::Pixiv
 	def list() return super+["tag_R18"] end
