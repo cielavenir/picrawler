@@ -23,7 +23,7 @@ mechanize (C) Michael Neumann / Aaron Patterson / Mike Dalessio / Eric Hodel / A
 ### You need Ruby 1.8.7 / 1.9.2 and Mechanize 2.1 or later. ###
 ### Sorry, but I use Mechanize#get 2.1 syntax.              ###
 As for specifying encoding in Ruby1.8, there should be several cases. Please be aware :p
-#Ruby 1.9.x (Debian/Ubuntu)
+#Ruby 1.9.x (Debian/Ubuntu) - Now defaults to ruby. You can get 1.9.3.194-1 package.
 #!/usr/bin/env ruby1.9.1
 #Ruby 1.8 [cannot support website modules encoded other than UTF-8]
 #!/usr/bin/ruby -Ku
@@ -35,7 +35,6 @@ gem install mechanize
 After installing Xcode, ( if 10.6(SnowLeopard) or lower, use http://developer.apple.com/devcenter/download.action?path=/Developer_Tools/xcode_3.2.6_and_ios_sdk_4.3__final/xcode_3.2.6_and_ios_sdk_4.3.dmg )
 sudo gem install mechanize
 [Debian/Ubuntu]
-sudo apt-get install libxml2-dev libxslt1-dev
 sudo apt-get install ruby1.9.1
 sudo apt-get install ruby-mechanize
 
@@ -74,6 +73,9 @@ Fixed fatal bug that pcrawl frontend won't work on non-UTF8 environments unless 
 Added Zerochan and Minitokyo (alpha) support.
 0.09.120505
 Updated Gelbooru for new picture URL.
+0.10.120614
+Reverted Gelbooru change.
+shebang defaults to /usr/bin/env ruby.
 
 [Creative Commons CC0]
 Statement of Purpose

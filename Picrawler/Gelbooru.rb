@@ -98,7 +98,7 @@ class Picrawler::Gelbooru
 		array.each{|e|
 			bookmark=0
 			#if e=~/(\d+).+?(http\:\/\/img.+?\.gelbooru\.com\/thumbs\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
-			if e=~/(\d+).+?(http\:\/\/youhate\.us\/thumbs\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
+			if e=~/(\d+).+?(http\:\/\/gelbooru\.com\/thumbs\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push([$1+'.'+$3, $2.sub("/thumbnail_","/").sub("/thumbs/","/images/")])
 			end

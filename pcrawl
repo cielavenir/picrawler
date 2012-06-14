@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby1.9.1
+#!/usr/bin/env ruby
 #coding:utf-8
 if RUBY_VERSION < '1.9.0' then $KCODE="u" end
 
@@ -8,7 +8,7 @@ Picrawler_gateway_path="Picrawler.rb" ###
 require "optparse"
 require "fileutils"
 
-Version = "0.09.120505"
+Version = "0.10.120614"
 STDOUT.sync = true
 
 def pcrawl(argv)
