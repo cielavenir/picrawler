@@ -54,7 +54,7 @@ class Picrawler::Zerochan
 		@page=start-1
 		@stop=stop
 		ret=member_next
-		if ret then puts(('Browsing http://www.zerochan.net/user/'+arg).encode(@encoding,"UTF-8")) end
+		if ret then puts(('Browsing http://www.zerochan.net/user/'+arg+'?s=id').encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -63,7 +63,7 @@ class Picrawler::Zerochan
 		@page+=1
 		if @seek_end then return false end
 		begin
-			@agent.get('http://www.zerochan.net/user/'+@arg.uriEncode+'?p='+@page.to_s)
+			@agent.get('http://www.zerochan.net/user/'+@arg.uriEncode+'?s=id&p='+@page.to_s)
 		rescue
 			return false
 		end
@@ -72,13 +72,17 @@ class Picrawler::Zerochan
 		@content=[]
 		body=@agent.page.body.resolve.split("<ul id=\"thumbs2\">")[1]
 		array=body.split("</li>")
-		array.shift
+		#array.shift
 		array.each{|e|
 			bookmark=0
+			if e=~/<span>(\d+) Fav<\/span>/m
+				bookmark=$1.to_i
+			end
 
-			if e=~/src=\"http\:\/\/s[0-9a-z]+\.zerochan\.net\/240\/([0-9a-z\/]+)\.(jpeg|jpg|png|gif)/m
+			#if e=~/src=\"http\:\/\/s[0-9a-z]+\.zerochan\.net\/240\/([0-9a-z\/]+)\.(jpeg|jpg|png|gif)/m
+			if e=~/src=\"http\:\/\/s[0-9a-z]+\.zerochan\.net\/([^"]+)\.240\.(\d+)\.(jpeg|jpg|png|gif)"/m
 				if @bookmark>0 && bookmark<@bookmark then next end
-				@content.push($1+"."+$2)
+				@content.push([$1+'.full.'+$2+'.'+$3,$2+'.'+$3])
 			end
 		}
 		if @content.length<1 then return false end
@@ -98,7 +102,7 @@ class Picrawler::Zerochan
 		@page=start-1
 		@stop=stop
 		ret=tag_next
-		if ret then puts(('Browsing http://www.zerochan.net/'+arg).encode(@encoding,"UTF-8")) end
+		if ret then puts(('Browsing http://www.zerochan.net/'+arg+'?s=id').encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -107,7 +111,7 @@ class Picrawler::Zerochan
 		@page+=1
 		if @seek_end then return false end
 		begin
-			@agent.get('http://www.zerochan.net/'+@arg.uriEncode+'?p='+@page.to_s)
+			@agent.get('http://www.zerochan.net/'+@arg.uriEncode+'?s=id&p='+@page.to_s)
 		rescue
 			return false
 		end
@@ -116,13 +120,17 @@ class Picrawler::Zerochan
 		@content=[]
 		body=@agent.page.body.resolve.split("<ul id=\"thumbs2\">")[1]
 		array=body.split("</li>")
-		array.shift
+		#array.shift
 		array.each{|e|
 			bookmark=0
+			if e=~/<span>(\d+) Fav<\/span>/m
+				bookmark=$1.to_i
+			end
 
-			if e=~/src=\"http\:\/\/s[0-9a-z]+\.zerochan\.net\/240\/([0-9a-z\/]+)\.(jpeg|jpg|png|gif)/m
+			#if e=~/src=\"http\:\/\/s[0-9a-z]+\.zerochan\.net\/240\/([0-9a-z\/]+)\.(jpeg|jpg|png|gif)/m
+			if e=~/src=\"http\:\/\/s[0-9a-z]+\.zerochan\.net\/([^"]+)\.240\.(\d+)\.(jpeg|jpg|png|gif)"/m
 				if @bookmark>0 && bookmark<@bookmark then next end
-				@content.push($1+"."+$2)
+				@content.push([$1+'.full.'+$2+'.'+$3,$2+'.'+$3])
 			end
 		}
 		if @content.length<1 then return false end
@@ -131,12 +139,12 @@ class Picrawler::Zerochan
 	end
 
 	def crawl
-		@content.each_with_index{|e,i| # e -> filename
-			if @filter.include?(File.basename(e,".*"))
+		@content.each_with_index{|e,i| # e[0] -> fullname, e[1] -> savename
+			if @filter.include?(File.basename(e[1],".*"))
 				if @fast then @seek_end=true end
 			else
-				@agent.get("http://static.zerochan.net/full/"+e, [], 'http://www.zerochan.net/') #2.1 syntax
-				@agent.page.save_as(File.basename(e)) #as file is written after obtaining whole file, it should be less dangerous.
+				@agent.get("http://static.zerochan.net/"+e[0], [], 'http://www.zerochan.net/') #2.1 syntax
+				@agent.page.save_as(e[1]) #as file is written after obtaining whole file, it should be less dangerous.
 				sleep(@sleep)
 			end
 			printf("Page %d %d/%d    \r",@page,i+1,@content.length)

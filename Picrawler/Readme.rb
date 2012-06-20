@@ -23,7 +23,7 @@ mechanize (C) Michael Neumann / Aaron Patterson / Mike Dalessio / Eric Hodel / A
 ### You need Ruby 1.8.7 / 1.9.2 and Mechanize 2.1 or later. ###
 ### Sorry, but I use Mechanize#get 2.1 syntax.              ###
 As for specifying encoding in Ruby1.8, there should be several cases. Please be aware :p
-#Ruby 1.9.x (Debian/Ubuntu) - Now defaults to ruby. You can get 1.9.3.194-1 package.
+#Ruby 1.9.x (Debian/Ubuntu) - Now pcrawl defaults to ruby. You can get 1.9.3.194-1 package.
 #!/usr/bin/env ruby1.9.1
 #Ruby 1.8 [cannot support website modules encoded other than UTF-8]
 #!/usr/bin/ruby -Ku
@@ -76,6 +76,8 @@ Updated Gelbooru for new picture URL.
 0.10.120614
 Reverted Gelbooru change.
 shebang defaults to /usr/bin/env ruby.
+0.11.120620
+Fixed Zerochan and Minitokyo.
 
 [Creative Commons CC0]
 Statement of Purpose

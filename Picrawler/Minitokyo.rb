@@ -42,51 +42,7 @@ class Picrawler::Minitokyo
 		#auth failed.
 		return -1
 	end
-=begin
-	def member_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
-		@novel=false
 
-		@page=start-1
-		@stop=stop
-		ret=member_next
-		if ret then puts(('Browsing http://www.zerochan.net/user/'+arg).encode(@encoding,"UTF-8")) end
-		return ret
-	end
-
-	def member_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
-		begin
-			@agent.get('http://www.zerochan.net/user/'+@arg.uriEncode+'?p='+@page.to_s)
-		rescue
-			return false
-		end
-
-		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
-		@content=[]
-		body=@agent.page.body.resolve.split("<ul id=\"thumbs2\">")[1]
-		array=body.split("</li>")
-		array.shift
-		array.each{|e|
-			bookmark=0
-
-			if e=~/src=\"http\:\/\/s[0-9a-z]+\.zerochan\.net\/240\/([0-9a-z\/]+)\.(jpeg|jpg|png|gif)/m
-				if @bookmark>0 && bookmark<@bookmark then next end
-				@content.push($1+"."+$2)
-			end
-		}
-		if @content.length<1 then return false end
-		sleep(@sleep)
-		return true
-	end
-=end
 	def tid_first(arg,bookmark,fast,filter,start,stop)
 		@arg=arg
 		@bookmark=bookmark
@@ -99,7 +55,7 @@ class Picrawler::Minitokyo
 		@page=start-1
 		@stop=stop
 		ret=tid_next
-		if ret then puts(('Browsing http://browse.minitokyo.net/gallery?tid='+@arg+'&index=3').encode(@encoding,"UTF-8")) end
+		if ret then puts(('Browsing http://browse.minitokyo.net/gallery?tid='+@arg+'&index=3&order=id').encode(@encoding,"UTF-8")) end
 		return ret
 	end
 
@@ -108,7 +64,7 @@ class Picrawler::Minitokyo
 		@page+=1
 		if @seek_end then return false end
 		begin
-			@agent.get('http://browse.minitokyo.net/gallery?tid='+@arg+'&index=3&page='+@page.to_s)
+			@agent.get('http://browse.minitokyo.net/gallery?tid='+@arg+'&index=3&order=id&page='+@page.to_s)
 		rescue
 			return false
 		end
@@ -117,7 +73,7 @@ class Picrawler::Minitokyo
 		@content=[]
 		body=@agent.page.body.resolve.split("<ul class=\"scans\">")[1]
 		array=body.split("</li>")
-		array.shift
+		#array.shift
 		array.each{|e|
 			bookmark=0
 
