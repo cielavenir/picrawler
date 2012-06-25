@@ -8,7 +8,7 @@ Picrawler_gateway_path="Picrawler.rb" ###
 require "optparse"
 require "fileutils"
 
-Version = "0.11.120620"
+Version = "0.12.120626"
 STDOUT.sync = true
 
 def pcrawl(argv)

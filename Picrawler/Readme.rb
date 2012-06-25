@@ -78,6 +78,8 @@ Reverted Gelbooru change.
 shebang defaults to /usr/bin/env ruby.
 0.11.120620
 Fixed Zerochan and Minitokyo.
+0.12.120626
+Fixed Pixiv Jun 25.
 
 [Creative Commons CC0]
 Statement of Purpose
