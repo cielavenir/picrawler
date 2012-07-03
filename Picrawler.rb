@@ -60,6 +60,7 @@ class Ini
 					if line.size==0 then next end
 					parsed = line.split("=")
 					if parsed.size!=2 then next end
+					if !currentSection || currentSection=="" then raise("currentSection is unset. line(#{file.lineno})=#{line}") end
 					@configHash[currentSection][parsed[0].strip] = parsed[1].strip
 				end
 			end
