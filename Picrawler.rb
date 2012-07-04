@@ -43,24 +43,24 @@ class Ini
 		open(@targetFile,"r"){|file|
 			@configHash = Hash.new
 			currentSection = ""
-
+			@configHash[currentSection] = Hash.new
 			while line = file.gets do
 				line.chomp!
-				if line =~ /^\[.+\]/ #section
-					sectionString = line.scan(/^\[.+\]/)
-					if sectionString.size==0 then raise("file format is invalid. null section is found.") end
-
-					currentSection = sectionString[0]
+				if line =~ /^(\[.+\])/ #section
+					#sectionString = line.scan(/^\[.+\]/)
+					#if sectionString.size==0 then raise("file format is invalid. null section is found.") end
+					currentSection = $1 #sectionString[0]
 					length = currentSection.size
-					name = currentSection[1,length-2]
+					name = currentSection[1..length-2]
 					currentSection = name
+					#p currentSection
 					@configHash[currentSection] = Hash.new
 				elsif line=~/^[;#]/ then next #comment
 				else #data
 					if line.size==0 then next end
 					parsed = line.split("=")
 					if parsed.size!=2 then next end
-					if !currentSection || currentSection=="" then raise("currentSection is unset. line(#{file.lineno})=#{line}") end
+					#if !currentSection || currentSection=="" then raise("currentSection is unset. line(#{file.lineno})=#{line}") end
 					@configHash[currentSection][parsed[0].strip] = parsed[1].strip
 				end
 			end

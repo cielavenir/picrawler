@@ -82,6 +82,8 @@ Fixed Zerochan and Minitokyo.
 Fixed Pixiv Jun 25.
 0.12a.120628
 Fixed Pixiv again.
+0.12b.120704
+Tweaked Ini parser.
 
 [Creative Commons CC0]
 Statement of Purpose

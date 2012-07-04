@@ -8,7 +8,7 @@ Picrawler_gateway_path="Picrawler.rb" ###
 require "optparse"
 require "fileutils"
 
-Version = "0.12a.120628"
+Version = "0.12b.120704"
 STDOUT.sync = true
 
 def pcrawl(argv)
@@ -45,7 +45,7 @@ OptionParser.new{|opt| #todo: trap Exception and show message in proper way
 	#if mode.length==0 then raise "SITE is mandatory." end
 	if mode.length==1 then pic.mode_list(mode[0]).each{|e| puts e};exit end
 	if mode.length!=3 then raise "COMMAND -> SITE MODE ARG" end
-	if stop>=0 && start>stop then "Not fulfilling: starting page <= ending page" end
+	if stop>=0 && start>stop then raise "Not fulfilling the rule; starting page <= ending page" end
 }
 
 unless pic.open(mode[0]) then exit end
