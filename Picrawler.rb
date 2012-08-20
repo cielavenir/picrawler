@@ -5,17 +5,33 @@
 
 require "rubygems"
 require "mechanize"
-require "uri"
+require "cgi"
 require "fileutils"
 require "pathname"
+
+class Object
+	public
+	def assureArray
+		return self.is_a?(Array) ? self : [self]
+	end
+	def extract(h,overwrite=false)
+		h.each{|k,v|
+			if overwrite || !self.instance_variable_defined?('@'+k) then
+				self.instance_variable_set('@'+k,v) #k should always be String
+			end
+		}
+	end
+end
 
 class String
 	def resolve(enc="UTF-8") #must be called if you use regexp for Mechanize::Page#body
 		if RUBY_VERSION >= '1.9.0' then self.force_encoding(enc) end
 		return self
 	end
-	def uriEncode() return URI.encode(self) end 
-	def uriDecode() return URI.decode(self) end
+	def uriEncode() CGI.escape(self) end 
+	def uriDecode() CGI.unescape(self) end
+	def realpath()  Pathname(self).realpath.to_s end
+	def dirname()   Pathname(self).dirname.to_s end
 end
 
 if Mechanize::VERSION >= '2.2'
@@ -219,11 +235,6 @@ class Hash
 		return self[a[0]].exists_rec?(a[1..-1])               #check child
 	end
 end
-
-class String
-	def realpath() return Pathname(self).realpath.to_s end
-	def dirname() return Pathname(self).dirname.to_s end
-end
 ###Libraries end
 
 class Picrawler
@@ -309,8 +320,8 @@ class Picrawler
 	end
 
 	#dynamic loading
-	def call_first(mode,id,bookmark,fast,filter,start,stop) return @pic.send(mode+"_first",id,bookmark,fast,filter,start,stop) end
-	def call_next(mode) return @pic.send(mode+"_next") end
+	def call_first(mode,id,bookmark,fast,filter,start,stop) return @pic.__send__(mode+"_first",id,bookmark,fast,filter,start,stop) end
+	def call_next(mode) return @pic.__send__(mode+"_next") end
 
 	def crawl() return @pic.crawl end
 end

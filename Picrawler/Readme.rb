@@ -84,6 +84,8 @@ Fixed Pixiv Jun 25.
 Fixed Pixiv again.
 0.12b.120704
 Tweaked Ini parser.
+0.12c.120820
+uriEncode() is now done via CGI.escape().
 
 [Creative Commons CC0]
 Statement of Purpose
