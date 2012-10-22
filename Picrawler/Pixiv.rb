@@ -20,7 +20,7 @@ class Picrawler::Pixiv
 		@novel=false
 	end
 
-	def list() return ["member","novel","tag","tagillust","tagcomic","tagnovel"] end
+	def list() return ["member","novel","tag","tagillust","tagcomic","tagnovel","response"] end
 
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
@@ -31,7 +31,7 @@ class Picrawler::Pixiv
 		end
 
 		#normal auth.
-		form = @agent.get('http://www.pixiv.net/').forms[0]
+		form = @agent.get('http://www.pixiv.net/').form_with(:action=>'/login.php')
 		form.pixiv_id = user
 		form.pass = pass
 		form.checkbox_with("skip").check
@@ -302,6 +302,52 @@ class Picrawler::Pixiv
 			if e=~/^(\d+)/
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push($1)
+			end
+		}
+		if @content.length<1 then return false end
+		sleep(@sleep)
+		return true
+	end
+
+	def response_first(arg,bookmark,fast,filter,start,stop)
+		@arg=arg
+		@bookmark=bookmark
+		if @bookmark==nil then @bookmark=0 end
+		@fast=fast
+		@filter=filter
+		@seek_end=false
+		@novel=false
+
+		@page=start-1
+		@stop=stop
+		ret=response_next
+		if ret then puts(('Browsing http://www.pixiv.net/response.php?type=illust&id='+arg).encode(@encoding,"UTF-8")) end
+		return ret
+	end
+
+	def response_next
+		if @page==@stop then return false end
+		@page+=1
+		if @seek_end then return false end
+		begin
+			@agent.get('http://www.pixiv.net/response.php?type=illust&id='+@arg+'&p='+@page.to_s)
+		rescue
+			return false
+		end
+
+		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
+		@content=[]
+		cont=@agent.page.body.resolve.split('<div class="response">')[2] #fixme
+		array=cont.split("<a href=\"member_illust.php?mode=medium&illust_id=")
+		array.shift
+		array.each{|e|
+			bookmark=0
+			if e=~/(\d+)件のブックマーク/
+				bookmark=$1.to_i
+			end
+			if e=~/^(\d+).+?(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/.+?\/\d+_s\.(jpeg|jpg|png|gif))/m #(?:\?[0-9]+)?)/m #just splitting, so I don't have to consider ?[0-9]+ stuff.
+				if @bookmark>0 && bookmark<@bookmark then next end
+				@content.push([$1, $2, $3])
 			end
 		}
 		if @content.length<1 then return false end

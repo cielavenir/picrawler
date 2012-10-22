@@ -86,6 +86,9 @@ Fixed Pixiv again.
 Tweaked Ini parser.
 0.12c.120820
 uriEncode() is now done via CGI.escape().
+0.13.121022
+Fixed Pixiv login (only Pixiv account is supported still).
+Pixiv supports image response.
 
 [Creative Commons CC0]
 Statement of Purpose
