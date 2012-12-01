@@ -5,20 +5,12 @@
 #I won't update this module out of alpha...
 
 class Picrawler::Minitokyo
-	def initialize(encoding,sleep)
+	def initialize(options={})
 		@agent=Mechanize.new
 		@agent.user_agent="Mozilla/5.0"
-		@encoding=encoding
-		@sleep=sleep
-
-		@content=[]
-		@seek_end=true
-		@arg=""
-		@bookmark=0
-		@fast=false
-		@filter=[]
-
-		@novel=false
+		@encoding=options[:encoding]||raise
+		@sleep=options[:sleep]||3
+		@notifier=options[:notifier]
 	end
 
 	def list() return ["tid"] end
@@ -43,26 +35,26 @@ class Picrawler::Minitokyo
 		return -1
 	end
 
-	def tid_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
+	def setup(options={})
+		@arg=options[:arg]||raise
+		@bookmark=options[:bookmark]||0
+		@fast=options[:fast]
+		@filter=options[:filter]||[]
+		@page=options[:start] ? options[:start]-1 : 0
+		@stop=options[:stop]||-1
+		@additional=options[:additional]||''
 		@seek_end=false
-		@novel=false
+	end
 
-		@page=start-1
-		@stop=stop
+	def tid_first(options={})
+		setup(options)
 		ret=tid_next
-		if ret then puts(('Browsing http://browse.minitokyo.net/gallery?tid='+@arg+'&index=3&order=id').encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://browse.minitokyo.net/gallery?tid='+@arg+'&index=3&order=id'+"\n" end
 		return ret
 	end
 
 	def tid_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://browse.minitokyo.net/gallery?tid='+@arg+'&index=3&order=id&page='+@page.to_s)
 		rescue
@@ -96,7 +88,7 @@ class Picrawler::Minitokyo
 				@agent.page.save_as(File.basename(e)) #as file is written after obtaining whole file, it should be less dangerous.
 				sleep(@sleep)
 			end
-			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
+			@notifier.call sprintf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

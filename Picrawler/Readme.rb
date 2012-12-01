@@ -89,6 +89,11 @@ uriEncode() is now done via CGI.escape().
 0.13.121022
 Fixed Pixiv login (only Pixiv account is supported still).
 Pixiv supports image response.
+0.20.121202
+Fixed Gelbooru.
+Overall refactoring. No more puts in Site modules. Callback is used instead.
+New frontend for batch processing.
+Slightly faster than normal frontend (compilation is done only once).
 
 [Creative Commons CC0]
 Statement of Purpose
@@ -120,18 +125,12 @@ d. Affirmer understands and acknowledges that Creative Commons is not a party to
 =end
 
 class Picrawler::Readme
-	def initialize(encoding,sleep)
+	def initialize(options={})
 		@agent=Mechanize.new
 		@agent.user_agent="Mozilla/5.0"
-		@encoding=encoding
-		@sleep=sleep
-
-		@content=[]
-		@seek_end=true
-		@arg=""
-		@bookmark=0
-		@fast=false
-		@filter=[]
+		@encoding=options[:encoding]||raise
+		@sleep=options[:sleep]||3
+		@notifier=options[:notifier]
 	end
 
 	def list() return [] end
@@ -159,36 +158,31 @@ class Picrawler::Readme
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter,start,stop) #Initialize variables then call next
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
+	def setup(options={})
+		@arg=options[:arg]||raise
+		@bookmark=options[:bookmark]||0
+		@fast=options[:fast]
+		@filter=options[:filter]||[]
+		@page=options[:start] ? options[:start]-1 : 0
+		@stop=options[:stop]||-1
+		@additional=options[:additional]||''
 		@seek_end=false
+	end
 
-		@page=start-1
-		@stop=stop
+	def member_first(options={}) #Initialize variables then call next
+		setup(options)
 		ret=member_next
-		if ret then puts(('Browsing '+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing '+@arg+"\n" end
 		return ret
 	end
 
 	def member_next #HTML Parser
 	end
 
-	def tag_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
-
-		@page=start-1
-		@stop=stop
+	def tag_first(options={})
+		setup(options)
 		ret=tag_next
-		if ret then puts(('Browsing '+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing '+@arg+"\n" end
 		return ret
 	end
 
@@ -203,7 +197,7 @@ class Picrawler::Readme
 				###
 				sleep(@sleep)
 			end
-			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
+			@notifier.call sprintf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

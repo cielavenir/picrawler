@@ -6,21 +6,12 @@
 #Please don't use this module in Ruby 1.8 (due to combined charcode issue).
 
 class Picrawler::Piapro
-	def initialize(encoding,sleep)
+	def initialize(options={})
 		@agent=Mechanize.new
 		@agent.user_agent="Mozilla/5.0"
-		@encoding=encoding
-		@sleep=sleep
-
-		@content=[]
-		@seek_end=true
-		@arg=""
-		@bookmark=0
-		@fast=false
-		@filter=[]
-
-		@type='image'
-		@argtype='pid'
+		@encoding=options[:encoding]||raise
+		@sleep=options[:sleep]||3
+		@notifier=options[:notifier]
 	end
 
 	def list() return ["member","tag","keyword","audio","tagaudio","keywordaudio"] end
@@ -35,7 +26,7 @@ class Picrawler::Piapro
 		if false
 			@agent.get('https://piapro.jp/logout/')
 			@agent.cookie_jar.save_as(cookie)
-			exit
+			return false
 		end
 
 		#normal auth.
@@ -51,63 +42,46 @@ class Picrawler::Piapro
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
+	def setup(options={})
+		@arg=options[:arg]||raise
+		@bookmark=options[:bookmark]||0
+		@fast=options[:fast]
+		@filter=options[:filter]||[]
+		@page=options[:start] ? options[:start]-1 : 0
+		@stop=options[:stop]||-1
+		@additional=options[:additional]||''
 		@seek_end=false
+	end
 
+	def member_first(options={})
+		setup(options)
 		@type='image'
 		@argtype='pid'
-
-		@page=start-1
-		@stop=stop
 		ret=member_next
-		if ret then puts(('Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg+"\n" end
 		return ret
 	end
 
-	def tag_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
-
+	def tag_first(options={})
+		setup(options)
 		@type='image'
 		@argtype='tag'
-
-		@page=start-1
-		@stop=stop
 		ret=member_next
-		if ret then puts(('Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg+"\n" end
 		return ret
 	end
 
-	def keyword_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
-
+	def keyword_first(options={})
+		setup(options)
 		@type='image'
 		@argtype='keyword'
-
-		@page=start-1
-		@stop=stop
 		ret=member_next
-		if ret then puts(('Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg+"\n" end
 		return ret
 	end
 
 	def member_next
-		if @page==@stop then return false end
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end
 		begin
 			@agent.get('http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg.encode('CP932','UTF-8').uriEncode+'&start_rec='+(@page*35).to_s)
 		rescue
@@ -138,63 +112,35 @@ class Picrawler::Piapro
 	alias tag_next member_next
 	alias keyword_next member_next
 
-	def audio_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
-
+	def audio_first(options={})
+		setup(options)
 		@type='audio'
 		@argtype='pid'
-
-		@page=start-1
-		@stop=stop
 		ret=audio_next
-		if ret then puts(('Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg+"\n" end
 		return ret
 	end
 
-	def tagaudio_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
-
+	def tagaudio_first(options={})
+		setup(options)
 		@type='audio'
 		@argtype='tag'
-
-		@page=start-1
-		@stop=stop
 		ret=audio_next
-		if ret then puts(('Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg+"\n" end
 		return ret
 	end
 
-	def keywordaudio_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
-
+	def keywordaudio_first(options={})
+		setup(options)
 		@type='audio'
 		@argtype='keyword'
-
-		@page=start-1
-		@stop=stop
 		ret=audio_next
-		if ret then puts(('Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg+"\n" end
 		return ret
 	end
 
 	def audio_next
-		if @page==@stop then return false end
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end
 		begin
 			@agent.get('http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg.encode('CP932','UTF-8').uriEncode+'&start_rec='+(@page*35).to_s)
 		rescue
@@ -245,7 +191,7 @@ class Picrawler::Piapro
 				@agent.page.save_as(e[0]+'.'+e[1]) #as file is written after obtaining whole file, it should be less dangerous.
 				sleep(@sleep)
 			end
-			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
+			@notifier.call sprintf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

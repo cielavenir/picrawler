@@ -3,34 +3,13 @@
 #Picrawler under CC0
 #Picrawler::Danbooru module
 
-require "rubygems"
-require "mechanize"
-require "uri"
-
-class String
-	def resolve #must be called if you use regexp for Mechanize::Page#body
-		if RUBY_VERSION >= '1.9.0' then self.force_encoding("UTF-8") end
-		return self
-	end
-
-	def uriEncode
-		return URI.encode(self)
-	end
-end
-
 class Picrawler::Danbooru
-	def initialize(encoding,sleep)
+	def initialize(options={})
 		@agent=Mechanize.new
 		@agent.user_agent="Mozilla/5.0"
-		@encoding=encoding
-		@sleep=sleep
-
-		@content=[]
-		@seek_end=true
-		@arg=""
-		@bookmark=0
-		@fast=false
-		@filter=[]
+		@encoding=options[:encoding]||raise
+		@sleep=options[:sleep]||3
+		@notifier=options[:notifier]
 	end
 
 	def list() return ["member","tag"] end
@@ -56,40 +35,34 @@ class Picrawler::Danbooru
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter,start,stop)
-		@arg="user:"+arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
+	def setup(options={})
+		@arg=options[:arg]||raise
+		@bookmark=options[:bookmark]||0
+		@fast=options[:fast]
+		@filter=options[:filter]||[]
+		@page=options[:start] ? options[:start]-1 : 0
+		@stop=options[:stop]||-1
+		@additional=options[:additional]||''
 		@seek_end=false
+	end
 
-		@page=start-1
-		@stop=stop
+	def member_first(options={})
+		setup(options)
+		@arg="user:"+@arg
 		ret=tag_next
-		if ret then puts(('Browsing http://danbooru.donmai.us/post?tags=user:'+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://danbooru.donmai.us/post?tags=user:'+@arg+"\n" end
 		return ret
 	end
 
-	def tag_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
-
-		@page=start-1
-		@stop=stop
+	def tag_first(options={})
+		setup(options)
 		ret=tag_next
-		if ret then puts(('Browsing http://danbooru.donmai.us/post?tags='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://danbooru.donmai.us/post?tags='+@arg+"\n" end
 		return ret
 	end
 
 	def tag_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://danbooru.donmai.us/post?tags='+@arg.uriEncode+'&page='+@page.to_s)
 		rescue
@@ -97,7 +70,7 @@ class Picrawler::Danbooru
 		end
 
 		if @agent.page.body.resolve=~/span id="cntdwn"/
-			printf("Advertised...\r")
+			@notifier.call "Advertised...\r"
 			sleep(10)
 			begin
 				@agent.get('http://danbooru.donmai.us/post?tags='+@arg.uriEncode+'&page='+@page.to_s)
@@ -148,7 +121,7 @@ class Picrawler::Danbooru
 					#search next ext.
 				}
 			end
-			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
+			@notifier.call sprintf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

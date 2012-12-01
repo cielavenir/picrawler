@@ -9,6 +9,9 @@ require "cgi"
 require "fileutils"
 require "pathname"
 
+Version = "0.20.121202"
+STDOUT.sync = true
+
 class Object
 	public
 	def assureArray
@@ -238,7 +241,9 @@ end
 ###Libraries end
 
 class Picrawler
-	def initialize(conf)
+	def initialize(conf,notifier)
+		@notifier=notifier
+
 		unless File.exist?(conf)
 			raise "cannot find "+conf
 		end
@@ -263,23 +268,23 @@ class Picrawler
 
 	def open(service)
 		unless @service_list.include?(service)
-			puts "[Error] Website module not available (Website module name is case-sensitive)."
+			@notifier.call "[Error] Website module not available (Website module name is case-sensitive).\n"
 			return false
 		end
 		unless @ini[service]
-			puts "[Error] Website not registered (Website module name is case-sensitive)."
+			@notifier.call "[Error] Website not registered (Website module name is case-sensitive).\n"
 			return false
 		end
 		sleeptime=@ini[service]["sleep"]
 		if sleeptime!=nil
 			sleeptime=sleeptime.to_f
 			if sleeptime < 1
-				puts "[Error] sleep must be 1 or more (2 or more is recommended)."
+				@notifier.call "[Error] sleep must be 1 or more (2 or more is recommended).\n"
 				return false
 			end
 			if sleeptime < 2
-				puts "[Warn] sleep should be 2 or more to avoid ban."
-				return false
+				@notifier.call "[Warn] sleep should be 2 or more to avoid ban.\n"
+				#return false
 			end
 		else
 			sleeptime=3 #default 3sec
@@ -293,17 +298,17 @@ class Picrawler
 		end
 
 		require File.expand_path(__FILE__.realpath.dirname+"/Picrawler/"+service+".rb")
-		@pic=Picrawler.const_get(service).new(@encoding,sleeptime)
+		@pic=Picrawler.const_get(service).new({:encoding=>@encoding,:sleep=>sleeptime,:notifier=>@notifier})
 		ret=@pic.open(@ini[service]["user"],@ini[service]["pass"],@cookie)	
 		if ret==-1
-			puts "[Error] Login Failed."
+			@notifier.call "[Error] Login Failed.\n"
 			return false
 		elsif ret==0
-			puts "Cookie Expired, re-logged in."
+			@notifier.call "Cookie Expired, re-logged in.\n"
 		elsif ret==1
-			puts "Use current credential."
+			@notifier.call "Use current credential.\n"
 		else
-			puts "[Error] Unknown error!"
+			@notifier.call "[Error] Unknown error!\n"
 			return false
 		end
 		return true
@@ -311,17 +316,42 @@ class Picrawler
 
 	def mode_list(service)
 		unless @service_list.include?(service)
-			puts "Website module not available (Website module name is case-sensitive)."
+			@notifier.call "Website module not available (Website module name is case-sensitive).\n"
 			return []
 		end
 		require File.expand_path(__FILE__.realpath.dirname+"/Picrawler/"+service+".rb")
-		@pic=Picrawler.const_get(service).new(@encoding,-1)
+		@pic=Picrawler.const_get(service).new({:encoding=>@encoding,:sleep=>-1,:notifier=>@notifier})
 		return @pic.list
 	end
 
 	#dynamic loading
-	def call_first(mode,id,bookmark,fast,filter,start,stop) return @pic.__send__(mode+"_first",id,bookmark,fast,filter,start,stop) end
+	def call_first(mode,options={}) return @pic.__send__(mode+"_first",options) end
 	def call_next(mode) return @pic.__send__(mode+"_next") end
 
 	def crawl() return @pic.crawl end
+
+	def pcrawl(service,mode,options={})
+		unless self.open(service) then return end
+		pwd=Dir.pwd
+		if options[:dir]==nil then options[:dir]=options[:arg].encode(@encoding,"UTF-8") end
+		FileUtils.mkpath(options[:dir])
+		Dir.chdir(options[:dir])
+		#filter
+		options[:filter]=Dir.glob("*").map{|e| File.basename(e,".*")}.sort
+		begin
+			File.open("filter.txt"){|f|
+				options[:filter]+=f.readlines
+			}
+		rescue; end
+
+		unless self.call_first(mode,options)
+			@notifier.call "Failed to retrive first page (perhaps not found)\n"
+			return
+		end
+		begin
+			crawl
+		end while self.call_next(mode)
+		@notifier.call "\n"
+		Dir.chdir(pwd)
+	end
 end

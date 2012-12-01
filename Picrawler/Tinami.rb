@@ -19,19 +19,12 @@ action_view_original=true&cont_id=ID&ethna_csrf=***
 =end
 
 class Picrawler::Tinami
-	def initialize(encoding,sleep)
+	def initialize(options={})
 		@agent=Mechanize.new
 		@agent.user_agent="Mozilla/5.0"
-		@encoding=encoding
-		@sleep=sleep
-
-		@content=[]
-		@seek_end=true
-		@arg=""
-		@bookmark=0
-		@fast=false
-		@filter=[]
-		@type=1
+		@encoding=options[:encoding]||raise
+		@sleep=options[:sleep]||3
+		@notifier=options[:notifier]
 	end
 
 	def list() return ["member","tag"] end
@@ -57,25 +50,27 @@ class Picrawler::Tinami
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
+	def setup(options={})
+		@arg=options[:arg]||raise
+		@bookmark=options[:bookmark]||0
+		@fast=options[:fast]
+		@filter=options[:filter]||[]
+		@page=options[:start] ? options[:start]-1 : 0
+		@stop=options[:stop]||-1
+		@additional=options[:additional]||''
 		@seek_end=false
-		@type=1
+	end
 
-		@page=start-1
-		@stop=stop
+	def member_first(options={})
+		setup(options)
+		@type=1
 		ret=member_next
-		if ret then puts(('Browsing http://www.tinami.com/search/list?sort=new&type[]=1&prof_id='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://www.tinami.com/search/list?sort=new&type[]=1&prof_id='+@arg+"\n" end
 		return ret
 	end
 
 	def member_next
-		if @page==@stop then return false end
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end
 		begin
 			@agent.get('http://www.tinami.com/search/list?sort=new&type[]=1&prof_id='+@arg+'&offset='+(@page*20).to_s)
 		rescue
@@ -99,25 +94,16 @@ class Picrawler::Tinami
 		return true
 	end
 
-	def tag_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
+	def tag_first(options={})
+		setup(options)
 		@type=1
-
-		@page=start-1
-		@stop=stop
 		ret=tag_next
-		if ret then puts(('Browsing http://www.tinami.com/search/list?sort=new&type[]=1&keyword='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://www.tinami.com/search/list?sort=new&type[]=1&keyword='+@arg+"\n" end
 		return ret
 	end
 
 	def tag_next
-		if @page==@stop then return false end
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end
 		begin
 			@agent.get('http://www.tinami.com/search/list?sort=new&type[]=1&keyword='+@arg.uriEncode+'&offset='+(@page*20).to_s)
 		rescue
@@ -168,7 +154,7 @@ class Picrawler::Tinami
 				else
 					raise "Type "+@type.to_s+" not implemented!"
 			end
-			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
+			@notifier.call sprintf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

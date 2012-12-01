@@ -5,18 +5,12 @@
 #Shunga/Comic/Book are not supported.
 
 class Picrawler::NicoSeiga
-	def initialize(encoding,sleep)
+	def initialize(options={})
 		@agent=Mechanize.new
 		@agent.user_agent="Mozilla/5.0"
-		@encoding=encoding
-		@sleep=sleep
-
-		@content=[]
-		@seek_end=true
-		@arg=""
-		@bookmark=0
-		@fast=false
-		@filter=[]
+		@encoding=options[:encoding]||raise
+		@sleep=options[:sleep]||3
+		@notifier=options[:notifier]
 	end
 
 	def list() return ["member","tag"] end
@@ -42,25 +36,26 @@ class Picrawler::NicoSeiga
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
+	def setup(options={})
+		@arg=options[:arg]||raise
+		@bookmark=options[:bookmark]||0
+		@fast=options[:fast]
+		@filter=options[:filter]||[]
+		@page=options[:start] ? options[:start]-1 : 0
+		@stop=options[:stop]||-1
+		@additional=options[:additional]||''
 		@seek_end=false
+	end
 
-		@page=start-1
-		@stop=stop
+	def member_first(options={})
+		setup(options)
 		ret=member_next
-		if ret then puts(('Browsing http://seiga.nicovideo.jp/user/illust/'+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://seiga.nicovideo.jp/user/illust/'+@arg+"\n" end
 		return ret
 	end
 
 	def member_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://seiga.nicovideo.jp/user/illust/'+@arg+'?page='+@page.to_s+'&sort=image_created')
 		rescue
@@ -86,25 +81,15 @@ class Picrawler::NicoSeiga
 		return true
 	end
 
-	def tag_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
-
-		@page=start-1
-		@stop=stop
+	def tag_first(options={})
+		setup(options)
 		ret=tag_next
-		if ret then puts(('Browsing http://seiga.nicovideo.jp/tag/'+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://seiga.nicovideo.jp/tag/'+@arg+"\n" end
 		return ret
 	end
 
 	def tag_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://seiga.nicovideo.jp/tag/'+@arg.uriEncode+'?page='+@page.to_s+'&target=illust&sort=image_created')
 		rescue
@@ -149,7 +134,7 @@ class Picrawler::NicoSeiga
 				@agent.page.save_as(e+ext) #as file is written after obtaining whole file, it should be less dangerous.
 				sleep(@sleep)
 			end
-			printf("Page %d %d/%d    \r",@page,i+1,@content.length)
+			@notifier.call sprintf("Page %d %d/%d    \r",@page,i+1,@content.length)
 		}
 	end
 end

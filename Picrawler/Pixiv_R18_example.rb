@@ -10,26 +10,16 @@ require File.expand_path(__FILE__.dirname+"/Pixiv.rb")
 class Picrawler::Pixiv_R18_example < Picrawler::Pixiv
 	def list() return super+["tag_R18"] end
 
-	def tag_R18_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
+	def tag_R18_first(options={})
+		setup(options)
 		@novel=false
-
-		@page=start-1
-		@stop=stop
 		ret=tag_R18_next
-		if ret then puts(('Browsing http://www.pixiv.net/search.php?s_mode=s_tag&r18=1&word='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&r18=1&word='+@arg+"\n" end
 		return ret
 	end
 
 	def tag_R18_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://www.pixiv.net/search.php?s_mode=s_tag&r18=1&word='+@arg.uriEncode+'&p='+@page.to_s)
 		rescue

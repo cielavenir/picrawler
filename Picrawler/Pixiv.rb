@@ -4,20 +4,12 @@
 #Picrawler::Pixiv module
 
 class Picrawler::Pixiv
-	def initialize(encoding,sleep)
+	def initialize(options={})
 		@agent=Mechanize.new
 		@agent.user_agent="Mozilla/5.0"
-		@encoding=encoding
-		@sleep=sleep
-
-		@content=[]
-		@seek_end=true
-		@arg=""
-		@bookmark=0
-		@fast=false
-		@filter=[]
-
-		@novel=false
+		@encoding=options[:encoding]||raise
+		@sleep=options[:sleep]||3
+		@notifier=options[:notifier]
 	end
 
 	def list() return ["member","novel","tag","tagillust","tagcomic","tagnovel","response"] end
@@ -43,26 +35,27 @@ class Picrawler::Pixiv
 		return -1
 	end
 
-	def member_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
+	def setup(options={})
+		@arg=options[:arg]||raise
+		@bookmark=options[:bookmark]||0
+		@fast=options[:fast]
+		@filter=options[:filter]||[]
+		@page=options[:start] ? options[:start]-1 : 0
+		@stop=options[:stop]||-1
+		@additional=options[:additional]||''
 		@seek_end=false
-		@novel=false
+	end
 
-		@page=start-1
-		@stop=stop
+	def member_first(options={})
+		setup(options)
+		@novel=false
 		ret=member_next
-		if ret then puts(('Browsing http://www.pixiv.net/member_illust.php?id='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://www.pixiv.net/member_illust.php?id='+@arg+"\n" end
 		return ret
 	end
 
 	def member_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://www.pixiv.net/member_illust.php?id='+@arg+'&p='+@page.to_s)
 		rescue
@@ -88,26 +81,16 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def novel_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
+	def novel_first(options={})
+		setup(options)
 		@novel=true
-
-		@page=start-1
-		@stop=stop
 		ret=novel_next
-		if ret then puts(('Browsing http://www.pixiv.net/novel/member.php?id='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://www.pixiv.net/novel/member.php?id='+@arg+"\n" end
 		return ret
 	end
 
 	def novel_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://www.pixiv.net/novel/member.php?id='+@arg+'&p='+@page.to_s)
 		rescue
@@ -131,26 +114,16 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def tag_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
+	def tag_first(options={})
+		setup(options)
 		@novel=false
-
-		@page=start-1
-		@stop=stop
 		ret=tag_next
-		if ret then puts(('Browsing http://www.pixiv.net/search.php?s_mode=s_tag&word='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&word='+@arg+"\n" end
 		return ret
 	end
 
 	def tag_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://www.pixiv.net/search.php?s_mode=s_tag&word='+@arg.uriEncode+'&p='+@page.to_s)
 		rescue
@@ -176,26 +149,16 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def tagillust_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
+	def tagillust_first(options={})
+		setup(options)
 		@novel=false
-
-		@page=start-1
-		@stop=stop
 		ret=tagillust_next
-		if ret then puts(('Browsing http://www.pixiv.net/search.php?s_mode=s_tag&manga=0&word='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&manga=0&word='+@arg+"\n" end
 		return ret
 	end
 
 	def tagillust_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://www.pixiv.net/search.php?s_mode=s_tag&manga=0&word='+@arg.uriEncode+'&p='+@page.to_s)
 		rescue
@@ -221,26 +184,16 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def tagcomic_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
+	def tagcomic_first(options={})
+		setup(options)
 		@novel=false
-
-		@page=start-1
-		@stop=stop
 		ret=tagcomic_next
-		if ret then puts(('Browsing http://www.pixiv.net/search.php?s_mode=s_tag&manga=1&word='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://www.pixiv.net/search.php?s_mode=s_tag&manga=1&word='+@arg+"\n" end
 		return ret
 	end
 
 	def tagcomic_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://www.pixiv.net/search.php?s_mode=s_tag&manga=1&word='+@arg.uriEncode+'&p='+@page.to_s)
 		rescue
@@ -266,26 +219,16 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def tagnovel_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
+	def tagnovel_first(options={})
+		setup(options)
 		@novel=true
-
-		@page=start-1
-		@stop=stop
 		ret=tagnovel_next
-		if ret then puts(('Browsing http://www.pixiv.net/novel/search.php?s_mode=s_tag&word='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://www.pixiv.net/novel/search.php?s_mode=s_tag&word='+@arg+"\n" end
 		return ret
 	end
 
 	def tagnovel_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://www.pixiv.net/novel/search.php?s_mode=s_tag&word='+@arg.uriEncode+'&p='+@page.to_s)
 		rescue
@@ -309,26 +252,16 @@ class Picrawler::Pixiv
 		return true
 	end
 
-	def response_first(arg,bookmark,fast,filter,start,stop)
-		@arg=arg
-		@bookmark=bookmark
-		if @bookmark==nil then @bookmark=0 end
-		@fast=fast
-		@filter=filter
-		@seek_end=false
+	def response_first(options={})
+		options={}
 		@novel=false
-
-		@page=start-1
-		@stop=stop
 		ret=response_next
-		if ret then puts(('Browsing http://www.pixiv.net/response.php?type=illust&id='+arg).encode(@encoding,"UTF-8")) end
+		if ret then @notifier.call 'Browsing http://www.pixiv.net/response.php?type=illust&id='+@arg+"\n" end
 		return ret
 	end
 
 	def response_next
-		if @page==@stop then return false end
-		@page+=1
-		if @seek_end then return false end
+		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
 			@agent.get('http://www.pixiv.net/response.php?type=illust&id='+@arg+'&p='+@page.to_s)
 		rescue
@@ -366,7 +299,7 @@ class Picrawler::Pixiv
 					File.open(e+".txt","wb"){|f| f.write(text)}
 					sleep(@sleep)
 				end
-				printf("Page %d %d/%d              \r",@page,i+1,@content.length) 
+				@notifier.call sprintf("Page %d %d/%d              \r",@page,i+1,@content.length) 
 			}
 		else
 			@content.each_with_index{|e,i| # e[0] -> ID, e[1] -> base URL, e[2] -> ext
@@ -393,7 +326,7 @@ class Picrawler::Pixiv
 							@agent.page.save_as(e[0]+"/"+e[0]+"_p0."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
 							sleep(@sleep)
 						end
-						printf("Page %d %d/%d Comic 0\r",@page,i+1,@content.length)
+						@notifier.call sprintf("Page %d %d/%d Comic 0\r",@page,i+1,@content.length)
 						
 						begin #start
 							j=0
@@ -403,12 +336,12 @@ class Picrawler::Pixiv
 								@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
 								@agent.page.save_as(e[0]+"/"+e[0]+(big ? "_big":"")+"_p"+j.to_s+"."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
 								sleep(@sleep)
-								printf("Page %d %d/%d Comic %d\r",@page,i+1,@content.length,j)
+								@notifier.call sprintf("Page %d %d/%d Comic %d\r",@page,i+1,@content.length,j)
 							end
 						rescue; end
 					end
 				end
-				printf("Page %d %d/%d              \r",@page,i+1,@content.length)
+				@notifier.call sprintf("Page %d %d/%d              \r",@page,i+1,@content.length)
 			}
 		end
 	end
