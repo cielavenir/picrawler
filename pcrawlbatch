@@ -6,6 +6,7 @@ Picrawler_gateway_path="Picrawler.rb" ###
 
 ###main
 require "fileutils"
+STDOUT.sync = true
 
 if __FILE__==$0
 	Dir.chdir(File.dirname(__FILE__))

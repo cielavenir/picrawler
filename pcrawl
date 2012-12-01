@@ -7,6 +7,7 @@ Picrawler_gateway_path="Picrawler.rb" ###
 ###main
 require "optparse"
 require "fileutils"
+STDOUT.sync = true
 
 def pcrawl(argv)
 Dir.chdir(File.dirname(__FILE__))

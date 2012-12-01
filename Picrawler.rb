@@ -7,10 +7,11 @@ require "rubygems"
 require "mechanize"
 require "cgi"
 require "fileutils"
-require "pathname"
+require "pathname" if RUBY_VERSION < '1.9'
+
+#require_relative shouldn't be used. Picrawler.rb might be called as symlink.
 
 Version = "0.20.121202"
-STDOUT.sync = true
 
 class Object
 	public
@@ -28,13 +29,19 @@ end
 
 class String
 	def resolve(enc="UTF-8") #must be called if you use regexp for Mechanize::Page#body
-		if RUBY_VERSION >= '1.9.0' then self.force_encoding(enc) end
+		if RUBY_VERSION >= '1.9' then self.force_encoding(enc) end
 		return self
 	end
 	def uriEncode() CGI.escape(self) end 
 	def uriDecode() CGI.unescape(self) end
-	def realpath()  Pathname(self).realpath.to_s end
-	def dirname()   Pathname(self).dirname.to_s end
+	def dirname()   File.dirname(self) end
+	def realpath
+		if RUBY_VERSION < '1.9'
+			Pathname(self).realpath.to_s
+		else
+			File.realpath(self)
+		end
+	end
 end
 
 if Mechanize::VERSION >= '2.2'
