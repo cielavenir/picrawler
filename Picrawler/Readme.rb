@@ -94,6 +94,8 @@ Fixed Gelbooru.
 Overall refactoring. No more puts in Site modules. Callback is used instead.
 New frontend for batch processing.
 Slightly faster than normal frontend (compilation is done only once).
+0.20a.121211
+Fixed Pixiv Dec 11.
 
 [Creative Commons CC0]
 Statement of Purpose
