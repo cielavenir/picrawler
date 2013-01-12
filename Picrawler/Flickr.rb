@@ -31,7 +31,7 @@ class Picrawler::Flickr
 
 	def member_first(options={})
 		setup(options)
-		ret=tag_next
+		ret=member_next
 		if ret then @notifier.call 'Browsing http://www.flickr.com/photos/'+@arg+"\n" end
 		return ret
 	end
@@ -39,7 +39,7 @@ class Picrawler::Flickr
 	def member_next
 		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
-			@agent.get('http://www.flickr.com/photos/'+@arg+'/page'+@page+'/')
+			@agent.get('http://www.flickr.com/photos/'+@arg+'/page'+@page.to_s+'/')
 		rescue
 			return false
 		end

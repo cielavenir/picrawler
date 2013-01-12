@@ -96,6 +96,8 @@ New frontend for batch processing.
 Slightly faster than normal frontend (compilation is done only once).
 0.20a.121211
 Fixed Pixiv Dec 11.
+0.20b.130112
+Fixed fatal bug of Flickr module.
 
 [Creative Commons CC0]
 Statement of Purpose
