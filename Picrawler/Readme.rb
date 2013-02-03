@@ -98,6 +98,9 @@ Slightly faster than normal frontend (compilation is done only once).
 Fixed Pixiv Dec 11.
 0.20b.130112
 Fixed fatal bug of Flickr module.
+0.21.130204
+Fixed fatal bug of pcrawl frontend -d option.
+Fixed Pixiv Jan 30.
 
 [Creative Commons CC0]
 Statement of Purpose

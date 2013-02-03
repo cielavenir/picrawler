@@ -36,7 +36,7 @@ OptionParser.new{|opt| #todo: trap Exception and show message in proper way
 	opt.on('-l','--list','show illust websites (module names)'){|v| pic.list.each{|e| puts e};exit }
 	#opt.on('-i VAL','--id','illustrator id'){|v| options[:id]=v}
 	#opt.on('-t VAL','--tag','illust tag'){|v| options[:tag]=v}
-	opt.on('-d VAL','--dir','save dir'){|v| dir=v}
+	opt.on('-d VAL','--dir','save dir'){|v| options[:dir]=v}
 	opt.on('-b VAL','--bookmark','bookmark number'){|v| options[:bookmark]=v.to_i}
 	opt.on('-s VAL','--start','starting page (>=1)'){|v| options[:start]=v.to_i;if options[:start]<1 then raise "starting page must be 1 or bigger" end}
 	opt.on('-e VAL','--end','ending page'){|v| options[:stop]=v.to_i}
@@ -47,7 +47,7 @@ OptionParser.new{|opt| #todo: trap Exception and show message in proper way
 	mode=opt.parse(argv.map{|e| e.encode("UTF-8",@encoding)})
 	#if mode.length==0 then raise "SITE is mandatory." end
 	if mode.length==1 then pic.mode_list(mode[0]).each{|e| puts e};exit end
-	if mode.length!=3 then raise "COMMAND -> SITE MODE ARG" end
+	if mode.length!=3 then raise "COMMAND is SITE [MODE ARG]" end
 	options[:arg]=mode[2]
 	if options[:stop]>=0 && options[:start]>options[:stop] then raise "Not fulfilling the rule; starting page <= ending page" end
 }
