@@ -353,6 +353,7 @@ class Picrawler
 
 		unless self.call_first(mode,options)
 			@notifier.call "Failed to retrive first page (perhaps not found)\n"
+			Dir.chdir(pwd)
 			return
 		end
 		begin

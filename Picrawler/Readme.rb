@@ -103,6 +103,7 @@ Fixed fatal bug of pcrawl frontend -d option.
 Fixed Pixiv Jan 30.
 0.22.130321
 Fixed fatal bug of filter.txt handling.
+Fixed pwd recovery if failed on first page.
 
 [Creative Commons CC0]
 Statement of Purpose
