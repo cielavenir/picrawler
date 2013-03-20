@@ -11,7 +11,7 @@ require "pathname" if RUBY_VERSION < '1.9'
 
 #require_relative shouldn't be used. Picrawler.rb might be called as symlink.
 
-Version = "0.21.130204"
+Version = "0.22.130321"
 
 class Object
 	public
@@ -347,7 +347,7 @@ class Picrawler
 		options[:filter]=Dir.glob("*").map{|e| File.basename(e,".*")}.sort
 		begin
 			File.open("filter.txt"){|f|
-				options[:filter]+=f.readlines
+				options[:filter]+=f.map(&:chomp) #f.readlines
 			}
 		rescue; end
 
