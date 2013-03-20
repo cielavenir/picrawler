@@ -248,7 +248,10 @@ end
 ###Libraries end
 
 class Picrawler
+	attr_reader :pwd # Perform Dir.chdir(pic.pwd) after using.
+
 	def initialize(conf,notifier)
+		@pwd=Dir.pwd
 		@notifier=notifier
 
 		unless File.exist?(conf)
@@ -274,6 +277,8 @@ class Picrawler
 	def list() return @service_list end
 
 	def open(service)
+		Dir.chdir(@pwd)
+
 		unless @service_list.include?(service)
 			@notifier.call "[Error] Website module not available (Website module name is case-sensitive).\n"
 			return false
