@@ -104,6 +104,8 @@ Fixed Pixiv Jan 30.
 0.22.130321
 Fixed fatal bug of filter.txt handling.
 Fixed pwd recovery if failed on first page.
+0.23.130324
+Fixed Pixiv Mar 22.
 
 [Creative Commons CC0]
 Statement of Purpose
