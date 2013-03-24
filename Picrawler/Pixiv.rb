@@ -71,9 +71,15 @@ class Picrawler::Pixiv
 			if e=~/(\d+)件のブックマーク/
 				bookmark=$1.to_i
 			end
+=begin
 			if e=~/^(\d+).+?(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/.+?\/\d+_s\.(jpeg|jpg|png|gif))/m #(?:\?[0-9]+)?)/m #just splitting, so I don't have to consider ?[0-9]+ stuff.
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push([$1, $2, $3])
+			end
+=end
+			if e=~/^(\d+)/
+				if @bookmark>0 && bookmark<@bookmark then next end
+				@content.push($1)
 			end
 		}
 		if @content.length<1 then return false end
@@ -139,9 +145,15 @@ class Picrawler::Pixiv
 			if e=~/(\d+)件のブックマーク/
 				bookmark=$1.to_i
 			end
+=begin
 			if e=~/^(\d+).+?(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/.+?\/\d+_s\.(jpeg|jpg|png|gif))/m #(?:\?[0-9]+)?)/m #just splitting, so I don't have to consider ?[0-9]+ stuff.
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push([$1, $2, $3])
+			end
+=end
+			if e=~/^(\d+)/
+				if @bookmark>0 && bookmark<@bookmark then next end
+				@content.push($1)
 			end
 		}
 		if @content.length<1 then return false end
@@ -174,9 +186,15 @@ class Picrawler::Pixiv
 			if e=~/(\d+)件のブックマーク/
 				bookmark=$1.to_i
 			end
+=begin
 			if e=~/^(\d+).+?(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/.+?\/\d+_s\.(jpeg|jpg|png|gif))/m #(?:\?[0-9]+)?)/m #just splitting, so I don't have to consider ?[0-9]+ stuff.
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push([$1, $2, $3])
+			end
+=end
+			if e=~/^(\d+)/
+				if @bookmark>0 && bookmark<@bookmark then next end
+				@content.push($1)
 			end
 		}
 		if @content.length<1 then return false end
@@ -209,9 +227,15 @@ class Picrawler::Pixiv
 			if e=~/(\d+)件のブックマーク/
 				bookmark=$1.to_i
 			end
+=begin
 			if e=~/^(\d+).+?(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/.+?\/\d+_s\.(jpeg|jpg|png|gif))/m #(?:\?[0-9]+)?)/m #just splitting, so I don't have to consider ?[0-9]+ stuff.
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push([$1, $2, $3])
+			end
+=end
+			if e=~/^(\d+)/
+				if @bookmark>0 && bookmark<@bookmark then next end
+				@content.push($1)
 			end
 		}
 		if @content.length<1 then return false end
@@ -278,9 +302,15 @@ class Picrawler::Pixiv
 			if e=~/(\d+)件のブックマーク/
 				bookmark=$1.to_i
 			end
+=begin
 			if e=~/^(\d+).+?(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/.+?\/\d+_s\.(jpeg|jpg|png|gif))/m #(?:\?[0-9]+)?)/m #just splitting, so I don't have to consider ?[0-9]+ stuff.
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push([$1, $2, $3])
+			end
+=end
+			if e=~/^(\d+)/
+				if @bookmark>0 && bookmark<@bookmark then next end
+				@content.push($1)
 			end
 		}
 		if @content.length<1 then return false end
@@ -302,28 +332,41 @@ class Picrawler::Pixiv
 				@notifier.call sprintf("Page %d %d/%d              \r",@page,i+1,@content.length) 
 			}
 		else
-			@content.each_with_index{|e,i| # e[0] -> ID, e[1] -> base URL, e[2] -> ext
-				if @filter.include?(e[0])
+			@content.each_with_index{|id,i| # e[0] -> ID, e[1] -> base URL, e[2] -> ext
+				if @filter.include?(id)
 					if @fast then @seek_end=true end
 				else
-					begin #try illust
-						@agent.get(e[1].gsub("_s.","."), [], 'http://www.pixiv.net/') #2.1 syntax
-						@agent.page.save_as(e[0]+"."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
+					@agent.get("http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id, [], 'http://www.pixiv.net/') #2.1 syntax
+					html=@agent.page.body.resolve
+					unless html=~/(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/.+?\/#{id}_m\.(jpeg|jpg|png|gif))/m
+						raise "[Developer's fault] Picture URL scheme changed"
+					end
+					base=$1
+					ext=$2
+					illust=html.index('member_illust.php?mode=big&amp;illust_id='+id)
+					comic=html.index('member_illust.php?mode=manga&amp;illust_id='+id)
+					if (illust&&comic) || (!illust&&!comic)
+						raise "[Developer's fault] Big link changed"
+					end
+					sleep(1)
+					if illust
+						@agent.get(base.gsub("_m.","."), [], 'http://www.pixiv.net/') #2.1 syntax
+						@agent.page.save_as(id+"."+ext) #as file is written after obtaining whole file, it should be less dangerous.
 						sleep(@sleep)
-					rescue #try comic
-						Dir.mkdir(e[0])
-						url_comic=e[1].gsub("_s.","_big_p0.")
+					elsif comic
+						Dir.mkdir(id)
+						url_comic=base.gsub("#{id}_m.","#{id}_big_p0.")
 						big=true
 						begin #big
 							@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
-							@agent.page.save_as(e[0]+"/"+e[0]+"_big_p0."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
+							@agent.page.save_as(id+"/"+id+"_big_p0."+ext) #as file is written after obtaining whole file, it should be less dangerous.
 							sleep(@sleep)
 						rescue #normal
-							url_comic=e[1].gsub("_s.","_p0.")
+							url_comic=e[1].gsub("#{id}_m.","#{id}_p0.")
 							big=false
 							# *** if exception is thown here, something is really wrong. ***
 							@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
-							@agent.page.save_as(e[0]+"/"+e[0]+"_p0."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
+							@agent.page.save_as(id+"/"+id+"_p0."+ext) #as file is written after obtaining whole file, it should be less dangerous.
 							sleep(@sleep)
 						end
 						@notifier.call sprintf("Page %d %d/%d Comic 0\r",@page,i+1,@content.length)
@@ -332,9 +375,9 @@ class Picrawler::Pixiv
 							j=0
 							while true
 								j+=1
-								url_comic=url_comic.gsub("_p"+(j-1).to_s+".","_p"+j.to_s+".")
+								url_comic=url_comic.gsub("_p"+(j-1).to_s+"."+ext,"_p"+j.to_s+"."+ext)
 								@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
-								@agent.page.save_as(e[0]+"/"+e[0]+(big ? "_big":"")+"_p"+j.to_s+"."+e[2]) #as file is written after obtaining whole file, it should be less dangerous.
+								@agent.page.save_as(id+"/"+id+(big ? "_big":"")+"_p"+j.to_s+"."+ext) #as file is written after obtaining whole file, it should be less dangerous.
 								sleep(@sleep)
 								@notifier.call sprintf("Page %d %d/%d Comic %d\r",@page,i+1,@content.length,j)
 							end
