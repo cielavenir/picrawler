@@ -24,16 +24,16 @@ mechanize (C) Michael Neumann / Aaron Patterson / Mike Dalessio / Eric Hodel / A
 ### Sorry, but I use Mechanize#get 2.1 syntax.              ###
 As for specifying encoding in Ruby1.8, there should be several cases. Please be aware :p
 #Ruby 1.9.x (Debian/Ubuntu) - Now pcrawl defaults to ruby. You can get 1.9.3.194-1 package.
-#!/usr/bin/env ruby1.9.1
 #Ruby 1.8 [cannot support website modules encoded other than UTF-8]
-#!/usr/bin/ruby -Ku
 
 How to install:
 [Windows]
+After installing RubyInstaller,
 gem install mechanize
 [OSX]
 After installing Xcode, ( if 10.6(SnowLeopard) or lower, use http://developer.apple.com/devcenter/download.action?path=/Developer_Tools/xcode_3.2.6_and_ios_sdk_4.3__final/xcode_3.2.6_and_ios_sdk_4.3.dmg )
 sudo gem install mechanize
+Or you can use rvm to install Ruby 1.9.x or 2.0.x.
 [Debian/Ubuntu]
 sudo apt-get install ruby1.9.1
 sudo apt-get install ruby-mechanize

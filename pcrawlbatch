@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #coding:utf-8
-if RUBY_VERSION < '1.9.0' then $KCODE="u" end
+$KCODE='u' if RUBY_VERSION<'1.9'
 
 Picrawler_gateway_path="Picrawler.rb" ###
 
