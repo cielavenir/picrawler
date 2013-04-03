@@ -106,6 +106,9 @@ Fixed fatal bug of filter.txt handling.
 Fixed pwd recovery if failed on first page.
 0.23.130324
 Fixed Pixiv Mar 22.
+0.24.130403
+Fixed Piapro Mar 31.
+Now that Piapro uses UTF-8, its module works on Ruby 1.8.
 
 [Creative Commons CC0]
 Statement of Purpose

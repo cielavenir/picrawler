@@ -1,9 +1,7 @@
-#coding:Windows-31J
+#coding:utf-8
 
 #Picrawler under CC0
 #Picrawler::Piapro module
-
-#Please don't use this module in Ruby 1.8 (due to combined charcode issue).
 
 class Picrawler::Piapro
 	def initialize(options={})
@@ -34,7 +32,7 @@ class Picrawler::Piapro
 		form.login_email = user
 		form.login_password = pass
 		form.checkbox_with("auto_login").check
-		if @agent.submit(form).body.resolve("CP932") =~ /ÉçÉOÉAÉEÉg/
+		if @agent.submit(form).body.resolve =~ /„É≠„Ç∞„Ç¢„Ç¶„Éà/
 			@agent.cookie_jar.save_as(cookie)
 			return 0
 		end
@@ -83,23 +81,23 @@ class Picrawler::Piapro
 	def member_next
 		if @page==@stop||@seek_end then return false end
 		begin
-			@agent.get('http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg.encode('CP932','UTF-8').uriEncode+'&start_rec='+(@page*35).to_s)
+			@agent.get('http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg.uriEncode+'&start_rec='+(@page*35).to_s)
 		rescue
 			return false
 		end
 		@page+=1
 
 		if
-			@agent.page.body.resolve("CP932")=~/\<li\>\<span class="dum page_navi_sp"\>NEXT&nbsp;&gt;&gt;\<\/span\>\<\/li\>/ || 
-			!(@agent.page.body.resolve("CP932")=~/"\>NEXT&nbsp;&gt;&gt;\<\/a\>\<\/li\>/) #only 1 page
+			@agent.page.body.resolve=~/\<li\>\<span class="dum page_navi_sp"\>NEXT&nbsp;&gt;&gt;\<\/span\>\<\/li\>/ || 
+			!(@agent.page.body.resolve=~/"\>NEXT&nbsp;&gt;&gt;\<\/a\>\<\/li\>/) #only 1 page
 		@seek_end=true end
 
 		@content=[]
-		array=@agent.page.body.resolve("CP932").split(" style=\"background:url")
+		array=@agent.page.body.resolve.split(" style=\"background:url")
 		array.shift
 		array.each{|e|
 			bookmark=0
-			if e=~/\(http:\/\/c\d.piapro.jp\/timg\/([0-9a-z]+)_[0-9]+_0120_0120\.([a-z]+)\)/
+			if e=~/\(http:\/\/c\d.piapro.jp\/timg\/([0-9a-z]+)_[0-9]+_0150_0150\.([a-z]+)\)/
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push([$1,$2])
 			end
@@ -142,19 +140,19 @@ class Picrawler::Piapro
 	def audio_next
 		if @page==@stop||@seek_end then return false end
 		begin
-			@agent.get('http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg.encode('CP932','UTF-8').uriEncode+'&start_rec='+(@page*35).to_s)
+			@agent.get('http://piapro.jp/content_list/?view='+@type+'&'+@argtype+'='+@arg.uriEncode+'&start_rec='+(@page*35).to_s)
 		rescue
 			return false
 		end
 		@page+=1
 
 		if
-			@agent.page.body.resolve("CP932")=~/\<li\>\<span class="dum page_navi_sp"\>NEXT&nbsp;&gt;&gt;\<\/span\>\<\/li\>/ || 
-			!(@agent.page.body.resolve("CP932")=~/"\>NEXT&nbsp;&gt;&gt;\<\/a\>\<\/li\>/) #only 1 page
+			@agent.page.body.resolve=~/\<li\>\<span class="dum page_navi_sp"\>NEXT&nbsp;&gt;&gt;\<\/span\>\<\/li\>/ || 
+			!(@agent.page.body.resolve=~/"\>NEXT&nbsp;&gt;&gt;\<\/a\>\<\/li\>/) #only 1 page
 		@seek_end=true end
 
 		@content=[]
-		array=@agent.page.body.resolve("CP932").split("<a href=\"javascript:swf_popup_display('")
+		array=@agent.page.body.resolve.split(".data('piapro_player', { id: '")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -175,19 +173,7 @@ class Picrawler::Piapro
 			if @filter.include?(e[0])
 				if @fast then @seek_end=true end
 			else
-				@agent.get("http://piapro.jp/download/?view=content_"+@type+"&id="+e[0], [], 'http://piapro.jp/') #2.1 syntax
-=begin
-				ext=""
-				if @agent.page.response["content-type"]=="image/jpeg"
-					ext=".jpg"
-				elsif @agent.page.response["content-type"]=="image/png"
-					ext=".png"
-				elsif @agent.page.response["content-type"]=="image/gif"
-					ext=".gif"
-				else
-					raise "[Developer's fault] must add crawl entry for "+@agent.page.response["content-type"]
-				end
-=end
+				@agent.get("http://piapro.jp/download/?view=content&id="+e[0], [], 'http://piapro.jp/') #2.1 syntax
 				@agent.page.save_as(e[0]+'.'+e[1]) #as file is written after obtaining whole file, it should be less dangerous.
 				sleep(@sleep)
 			end
