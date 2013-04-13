@@ -109,6 +109,8 @@ Fixed Pixiv Mar 22.
 0.24.130403
 Fixed Piapro Mar 31.
 Now that Piapro uses UTF-8, its module works on Ruby 1.8.
+0.24a.130413
+Pixiv module won't mkdir if downloading fails.
 
 [Creative Commons CC0]
 Statement of Purpose

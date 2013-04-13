@@ -354,11 +354,12 @@ class Picrawler::Pixiv
 						@agent.page.save_as(id+"."+ext) #as file is written after obtaining whole file, it should be less dangerous.
 						sleep(@sleep)
 					elsif comic
-						Dir.mkdir(id)
+						#Dir.mkdir(id)
 						url_comic=base.gsub("#{id}_m.","#{id}_big_p0.")
 						big=true
 						begin #big
 							@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
+							Dir.mkdir(id)
 							@agent.page.save_as(id+"/"+id+"_big_p0."+ext) #as file is written after obtaining whole file, it should be less dangerous.
 							sleep(@sleep)
 						rescue #normal
@@ -366,6 +367,7 @@ class Picrawler::Pixiv
 							big=false
 							# *** if exception is thown here, something is really wrong. ***
 							@agent.get(url_comic, [], 'http://www.pixiv.net/') #2.1 syntax
+							Dir.mkdir(id)
 							@agent.page.save_as(id+"/"+id+"_p0."+ext) #as file is written after obtaining whole file, it should be less dangerous.
 							sleep(@sleep)
 						end
