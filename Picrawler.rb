@@ -66,7 +66,7 @@ class Ini
 	end
 
 	def load()
-		open(@targetFile,"r"){|file|
+		File.open(@targetFile,"r"){|file|
 			@configHash = Hash.new
 			currentSection = ""
 			@configHash[currentSection] = Hash.new
@@ -97,7 +97,7 @@ class Ini
 	def [](str) return @configHash[str] end
 
 	def put(saveFileName="default.ini",saveTargetData=@configHash)
-		open(saveFileName,"w"){|fp|
+		File.open(saveFileName,"w"){|fp|
 =begin
 			#group
 			if saveTargetData.key?("groups")
