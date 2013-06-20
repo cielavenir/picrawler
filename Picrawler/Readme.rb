@@ -113,6 +113,10 @@ Now that Piapro uses UTF-8, its module works on Ruby 1.8.
 Pixiv module won't mkdir if downloading fails.
 0.24b.130414
 Successfully strips Facebook tag on Pixiv (perhaps due to Mar 22 update).
+0.25.130620
+Fixed Piapro login.
+Fixed open() vulneravility.
+Fixed Gelbooru.
 
 [Creative Commons CC0]
 Statement of Purpose

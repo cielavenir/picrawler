@@ -17,8 +17,8 @@ class Picrawler::Piapro
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["piapro.jp","/",'%98y%E2%E1%F4nQ%C8'])
-				unless @agent.cookie_jar.jar["piapro.jp"]["/"]['%98y%E2%E1%F4nQ%C8'].expired? then return 1 end #use cookie
+			if @agent.cookie_jar.jar.exists_rec?(["piapro.jp","/",'piapror'])
+				unless @agent.cookie_jar.jar["piapro.jp"]["/"]['piapror'].expired? then return 1 end #use cookie
 			end
 		end
 		if false
@@ -28,10 +28,10 @@ class Picrawler::Piapro
 		end
 
 		#normal auth.
-		form = @agent.get('https://piapro.jp/login/').form_with(:action=>"https://piapro.jp/login/")
-		form.login_email = user
-		form.login_password = pass
-		form.checkbox_with("auto_login").check
+		form = @agent.get('https://piapro.jp/login/').form_with(:action=>"/login/exe")
+		form._username = user
+		form._password = pass
+		form.checkbox_with("_remember_me").check
 		if @agent.submit(form).body.resolve =~ /ログアウト/
 			@agent.cookie_jar.save_as(cookie)
 			return 0
