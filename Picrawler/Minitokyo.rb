@@ -13,7 +13,7 @@ class Picrawler::Minitokyo
 		@notifier=options[:notifier]
 	end
 
-	def list() return ["tid"] end
+	def list() return ["tidwall","tidscan"] end
 
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
@@ -46,30 +46,36 @@ class Picrawler::Minitokyo
 		@seek_end=false
 	end
 
-	def tid_first(options={})
+	def tid_first_main(index,sep1,sep2,options={})
+		@index=index
+		@sep1=sep1
+		@sep2=sep2
 		setup(options)
-		ret=tid_next
-		if ret then @notifier.call 'Browsing http://browse.minitokyo.net/gallery?tid='+@arg+'&index=3&order=id'+"\n" end
+		ret=tid_next_main
+		if ret then @notifier.call 'Browsing http://browse.minitokyo.net/gallery?tid='+@arg+'&index='+@index+'&order=id'+"\n" end
 		return ret
 	end
+	def tidwall_first(options={}) return tid_first_main('1','<dl class="wallpapers">','</dt>',options) end
+	def tidscan_first(options={}) return tid_first_main('3','<ul class="scans">','</li>',options) end
+	alias_method :tid_first, :tidscan_first
 
-	def tid_next
+	def tid_next_main
 		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
-			@agent.get('http://browse.minitokyo.net/gallery?tid='+@arg+'&index=3&order=id&page='+@page.to_s)
+			@agent.get('http://browse.minitokyo.net/gallery?tid='+@arg+'&index='+@index+'&order=id&page='+@page.to_s)
 		rescue
 			return false
 		end
 
 		unless @agent.page.body.resolve=~/Next &raquo;/ then @seek_end=true end
 		@content=[]
-		body=@agent.page.body.resolve.split("<ul class=\"scans\">")[1]
-		array=body.split("</li>")
+		body=@agent.page.body.resolve.split(@sep1)[1]
+		array=body.split(@sep2)
 		#array.shift
 		array.each{|e|
 			bookmark=0
 
-			if e=~/src=\"http\:\/\/static2\.minitokyo\.net\/thumbs\/([0-9a-z\/]+)\.(jpeg|jpg|png|gif)/m
+			if e=~/src=\"http\:\/\/static[0-9]*\.minitokyo\.net\/thumbs\/([0-9a-z\/]+)\.(jpeg|jpg|png|gif)/m
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push($1+"."+$2)
 			end
@@ -78,6 +84,9 @@ class Picrawler::Minitokyo
 		sleep(@sleep)
 		return true
 	end
+	alias_method :tidwall_next, :tid_next_main
+	alias_method :tidscan_next, :tid_next_main
+	alias_method :tid_next, :tid_next_main
 
 	def crawl
 		@content.each_with_index{|e,i| # e -> filename
