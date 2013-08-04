@@ -363,7 +363,7 @@ class Picrawler::Pixiv
 							@agent.page.save_as(id+"/"+id+"_big_p0."+ext) #as file is written after obtaining whole file, it should be less dangerous.
 							sleep(@sleep)
 						rescue #normal
-							url_comic=e[1].gsub("#{id}_m.","#{id}_p0.")
+							url_comic=base.gsub("#{id}_m.","#{id}_p0.")
 							big=false
 							# *** if exception is thown here, something is really wrong. ***
 							@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
