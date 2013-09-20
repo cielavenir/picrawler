@@ -117,6 +117,8 @@ Successfully strips Facebook tag on Pixiv (perhaps due to Mar 22 update).
 Fixed Piapro login.
 Fixed open() vulneravility.
 Fixed Gelbooru.
+0.26.130920
+Fixed Pixiv regex.
 
 [Creative Commons CC0]
 Statement of Purpose
