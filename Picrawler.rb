@@ -6,6 +6,7 @@
 require "rubygems"
 require "mechanize"
 require "cgi"
+require "uri"
 require "fileutils"
 require "pathname" if RUBY_VERSION<'1.9'
 
@@ -32,8 +33,12 @@ class String
 		if RUBY_VERSION >= '1.9' then self.force_encoding(enc) end
 		return self
 	end
+	#in QUERY_STRING
 	def uriEncode() CGI.escape(self) end 
 	def uriDecode() CGI.unescape(self) end
+	#in PATH_INFO
+	def uriEncodePath() URI.encode(self) end
+	def uriDecodePath() URI.decode(self) end
 	def dirname()   File.dirname(self) end
 	def realpath
 		if RUBY_VERSION < '1.9'
@@ -251,6 +256,7 @@ class Picrawler
 	attr_reader :pwd # Perform Dir.chdir(pic.pwd) after using.
 
 	def initialize(conf,notifier)
+		@__signal_needtobreak__=false
 		@pwd=Dir.pwd
 		@notifier=notifier
 
@@ -336,9 +342,32 @@ class Picrawler
 		return @pic.list
 	end
 
+	def enter_critical
+		@__signal_int__=trap('INT'){@__signal_needtobreak__=true}
+		@__signal_break__=trap('BREAK'){@__signal_needtobreak__=true}
+		@__signal_term__=trap('TERM'){@__signal_needtobreak__=true}
+		#@__signal_hup__=trap('HUP'){@__signal_needtobreak__=true} #in case SSH?
+	end
+	def exit_critical
+		trap('INT',@__signal_int__)
+		trap('BREAK',@__signal_break__)
+		trap('TERM',@__signal_term__)
+		#trap('HUP',@__signal_hup__)
+		if @__signal_needtobreak__
+			puts "You interrupted Picrawler while writing file."
+			puts "Don't worry, I have delayed termination until writing is done."
+			exit 1
+		end
+	end
+
 	#dynamic loading
-	def call_first(mode,options={}) return @pic.__send__(mode+"_first",options) end
-	def call_next(mode) return @pic.__send__(mode+"_next") end
+	def call_first(mode,options={})
+		@mode=mode
+		options[:enter_critical]=method(:enter_critical)
+		options[:exit_critical]=method(:exit_critical)
+		return @pic.__send__(@mode+"_first",options)
+	end
+	def call_next() return @pic.__send__(@mode+"_next") end
 
 	def crawl() return @pic.crawl end
 
@@ -363,7 +392,7 @@ class Picrawler
 		end
 		begin
 			crawl
-		end while self.call_next(mode)
+		end while self.call_next
 		@notifier.call "\n"
 		Dir.chdir(pwd)
 	end

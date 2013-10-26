@@ -55,7 +55,7 @@ class Picrawler::Zerochan
 	def member_next
 		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
-			@agent.get('http://www.zerochan.net/user/'+@arg.uriEncode+'?s=id&p='+@page.to_s)
+			@agent.get('http://www.zerochan.net/user/'+@arg.uriEncodePath+'?s=id&p='+@page.to_s)
 		rescue
 			return false
 		end
@@ -92,7 +92,7 @@ class Picrawler::Zerochan
 	def tag_next
 		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
-			@agent.get('http://www.zerochan.net/'+@arg.uriEncode+'?s=id&p='+@page.to_s)
+			@agent.get('http://www.zerochan.net/'+@arg.uriEncodePath+'?s=id&p='+@page.to_s)
 		rescue
 			return false
 		end

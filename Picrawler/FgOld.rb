@@ -1,10 +1,10 @@
 #coding:utf-8
 
 #Picrawler under CC0
-#Picrawler::Fg module
+#Picrawler::FgOld module
 #bookmark isn't implemented.
 
-class Picrawler::Fg
+class Picrawler::FgOld
 	def initialize(options={})
 		@agent=Mechanize.new
 		@agent.user_agent="Mozilla/5.0"
@@ -18,16 +18,16 @@ class Picrawler::Fg
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["www.fg-site.net","/","wordpress_logged_in_0ec92a783201088155448925f5e07044"])
-				unless @agent.cookie_jar.jar["www.fg-site.net"]["/"]["wordpress_logged_in_0ec92a783201088155448925f5e07044"].expired? then return 1 end #use cookie
+			if @agent.cookie_jar.jar.exists_rec?(["fg-site.net","/","my_id"])
+				unless @agent.cookie_jar.jar["fg-site.net"]["/"]["my_id"].expired? then return 1 end #use cookie
 			end
 		end
 
 		#normal auth.
-		form = @agent.get('http://www.fg-site.net/').form_with(:action=>"http://www.fg-site.net/wp-login.php?redirect_to=%2F")
-		form.field_with("log").value = user
-		form.field_with("pwd").value = pass
-		form.checkbox_with("rememberme").check
+		form = @agent.get('http://www.fg-site.net/old/users/login/').form_with(:action=>"/old/users/login")
+		form.field_with("data[email]").value = user
+		form.field_with("data[password]").value = pass
+		form.checkbox_with("data[autologin]").check
 		if @agent.submit(form).body.resolve =~ /ログアウト/
 			@agent.cookie_jar.save_as(cookie)
 			return 0
@@ -50,28 +50,28 @@ class Picrawler::Fg
 	def member_first(options={})
 		setup(options)
 		ret=member_next
-		if ret then @notifier.call 'Browsing http://www.fg-site.net/members/'+@arg+"/gallery\n" end
+		if ret then @notifier.call 'Browsing http://www.fg-site.net/old/contents/view/'+@arg+"/\n" end
 		return ret
 	end
 
 	def member_next
 		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
-			@agent.get('http://www.fg-site.net/members/'+@arg+'/gallery?page='+@page.to_s)
+			@agent.get('http://www.fg-site.net/old/contents/view/'+@arg+'/page:'+@page.to_s)
 		rescue
 			return false
 		end
 
 		unless @agent.page.body.resolve=~/次の20件/ then @seek_end=true end ###
 		@content=[]
-		array=@agent.page.body.resolve.split("<a href=\"http://www.fg-site.net/archives/")
+		array=@agent.page.body.resolve.split("<a href=\"http://www.fg-site.net/old/products/")
 		array.shift
 		array.each{|e|
 			bookmark=0
-			if e=~/.+?(http\:\/\/www\.fg-site\.net\/wp-content\/uploads\/[0-9]+\/[0-9]+\/([0-9]+)-image[0-9]+)-[0-9x]+(\.(jpeg|jpg|png|gif))/m
+			if e=~/.+?(http\:\/\/image.+?\.fg-site\.net\/image\/mid\/\d+\/(.+?\.(jpeg|jpg|png|gif)))/m
 				if @bookmark>0 && bookmark<@bookmark then next end
-				url,filename,ext = $1,$2,$3
-				@content.push([filename+ext,url+ext])
+				url,filename = $1,$2
+				@content.push([filename.gsub("mid","lrg"), url.gsub("/mid","/lrg")])
 			end
 		}
 		if @content.length<1 then return false end
@@ -82,28 +82,27 @@ class Picrawler::Fg
 	def search_first(options={})
 		setup(options)
 		ret=search_next
-		if ret then @notifier.call 'Browsing http://www.fg-site.net/?s='+@arg+"/\n" end
+		if ret then @notifier.call 'Browsing http://www.fg-site.net/old/contents/search/sort:created/direction:desc/word:'+@arg+"/\n" end
 		return ret
 	end
 
 	def search_next
 		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
-			@agent.get('http://www.fg-site.net/?s='+@arg.uriEncode+'&page='+@page.to_s)
+			@agent.get('http://www.fg-site.net/old/contents/search/sort:created/direction:desc/word:'+@arg.uriEncodePath+'/page:'+@page.to_s)
 		rescue
 			return false
 		end
 
 		unless @agent.page.body.resolve=~/次の20件/ then @seek_end=true end ###
 		@content=[]
-		array=@agent.page.body.resolve.split("<a href=\"http://www.fg-site.net/archives/")
+		array=@agent.page.body.resolve.split("<a href=\"http://www.fg-site.net/old/products/")
 		array.shift
 		array.each{|e|
-			bookmark=0
-			if e=~/.+?(http\:\/\/www\.fg-site\.net\/wp-content\/uploads\/[0-9]+\/[0-9]+\/([0-9]+)-image[0-9]+)-[0-9x]+(\.(jpeg|jpg|png|gif))/m
+			if e=~/.+?(http\:\/\/image.+?\.fg-site\.net\/image\/mid\/\d+\/(.+?\.(jpeg|jpg|png|gif)))/m
 				if @bookmark>0 && bookmark<@bookmark then next end
-				url,filename,ext = $1,$2,$3
-				@content.push([filename+ext,url+ext])
+				url,filename = $1,$2
+				@content.push([filename.gsub("mid","lrg"), url.gsub("/mid","/lrg")])
 			end
 		}
 		if @content.length<1 then return false end
@@ -113,11 +112,10 @@ class Picrawler::Fg
 
 	def crawl
 		@content.each_with_index{|e,i| # e[0] -> filename, e[1] -> URL
-			e[0]=~/^([0-9]+)/
 			if @filter.include?(File.basename(e[0],".*"))
 				if @fast then @seek_end=true end
 			else
-				@agent.get(e[1], [], 'http://www.fg-site.net/') #2.1 syntax
+				@agent.get(e[1], [], 'http://www.fg-site.net/old/') #2.1 syntax
 				@agent.page.save_as(e[0]) #as file is written after obtaining whole file, it should be less dangerous.
 				sleep(@sleep)
 			end
@@ -125,3 +123,4 @@ class Picrawler::Fg
 		}
 	end
 end
+=end

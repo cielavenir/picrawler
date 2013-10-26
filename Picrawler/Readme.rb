@@ -119,6 +119,13 @@ Fixed open() vulneravility.
 Fixed Gelbooru.
 0.26.130920
 Fixed Pixiv regex.
+0.30.131026
+Modified Picrawler.rb interface.
+Implemented accessing re-submitted pictures (Pixiv Premium feature).
+Fixed my-pix access.
+Fixed Zerochan search (queries with spaces were not sent properly)
+Reimplemented Fg driver.
+Added Pixiv2 driver (use only for research purpose!)
 
 [Creative Commons CC0]
 Statement of Purpose

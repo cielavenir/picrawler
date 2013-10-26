@@ -1,0 +1,138 @@
+#!/usr/bin/env ruby
+#coding:utf-8
+$KCODE='u' if RUBY_VERSION<'1.9'
+
+require 'mechanize'
+
+###Libraries
+#Ini Reader/Writer http://d.hatena.ne.jp/white-azalea/20081109/1226244784
+class Ini
+	def initialize(targetFileName = "./default.ini")
+		@targetFile = targetFileName
+		if File.exists?(@targetFile) then self.load end
+	end
+
+	def load()
+		File.open(@targetFile,"r"){|file|
+			@configHash = Hash.new
+			currentSection = ""
+			@configHash[currentSection] = Hash.new
+			while line = file.gets do
+				line.chomp!
+				if line =~ /^(\[.+\])/ #section
+					#sectionString = line.scan(/^\[.+\]/)
+					#if sectionString.size==0 then raise("file format is invalid. null section is found.") end
+					currentSection = $1 #sectionString[0]
+					length = currentSection.size
+					name = currentSection[1..length-2]
+					currentSection = name
+					#p currentSection
+					@configHash[currentSection] = Hash.new
+				elsif line=~/^[;#]/ then next #comment
+				else #data
+					if line.size==0 then next end
+					parsed = line.split("=")
+					if parsed.size!=2 then next end
+					#if !currentSection || currentSection=="" then raise("currentSection is unset. line(#{file.lineno})=#{line}") end
+					@configHash[currentSection][parsed[0].strip] = parsed[1].strip
+				end
+			end
+		}
+	end
+  
+	def get() return @configHash end
+	def [](str) return @configHash[str] end
+
+	def put(saveFileName="default.ini",saveTargetData=@configHash)
+		File.open(saveFileName,"w"){|fp|
+=begin
+			#group
+			if saveTargetData.key?("groups")
+				fp.puts("[groups]")
+				saveTargetData["groups"].each{|key,value|
+					fp.puts(key + "=" + value)
+				}
+				saveTargetData.delete("groups")
+			end
+=end
+			#write
+			saveTargetData.each{|section,inner|
+				fp.puts("[" + section + "]")
+				inner.each{|key,value|
+					fp.puts(key + "=" + value)
+				}
+			}
+		}
+	end
+end
+
+class String
+	def resolve(enc="UTF-8") #must be called if you use regexp for Mechanize::Page#body
+		if RUBY_VERSION >= '1.9' then self.force_encoding(enc) end
+		return self
+	end
+end
+
+class Hash
+	def exists_rec?(a)
+		#if a.length<1 then return false
+		if !self.include?(a[0]) then return nil end           #if not found
+		if a.length==1 then return self[a[0]] end             #if found and last
+		if !self[a[0]].instance_of?(Hash) then return nil end #if not last and child not hash
+		return self[a[0]].exists_rec?(a[1..-1])               #check child
+	end
+end
+
+###main
+Dir.chdir(File.dirname(__FILE__))
+ini=Ini.new(File.expand_path("Picrawler.ini"))
+cookie=ini["General"]["cookie"]
+if cookie==nil
+	cookie=File.expand_path("Picrawler.yaml")
+else
+	cookie=File.expand_path(cookie)
+end
+
+agent=Mechanize.new
+agent.user_agent="Mozilla/5.0"
+if File.exist?(cookie)
+	agent.cookie_jar.load(cookie)
+	if agent.cookie_jar.jar.exists_rec?(["pixiv.com","/","_pixiv-universe_session"])
+		unless agent.cookie_jar.jar["pixiv.com"]["/"]["_pixiv-universe_session"].expired?
+			puts 'Cookie is not expired yet'
+			exit
+		end
+	end
+end
+
+DATA.each{|e|
+	puts 'Trying '+e
+	_e=e.split(':')
+	begin
+		agent.set_proxy(_e[0],_e[1].to_i)
+		form = agent.get('http://www.pixiv.com/').form_with(:action=>'/auth')
+		form.field('auth[account]').value = ini['Pixiv']['user']
+		form.field('auth[password]').value = ini['Pixiv']['pass']
+		form.checkbox_with('auth[permanent]').check
+		if agent.submit(form).body.resolve =~ /Log Out/
+			agent.cookie_jar.save_as(cookie)
+			puts 'Cookie obtained successfully!'
+			exit
+		end
+	rescue; end
+}
+puts 'Failed...'
+
+#Proxy Entries
+#host:port
+__END__
+46-105-42-93.kimsufi.com:3128
+94.247.25.163:80
+athene.ssh.onlysavvy.com:3128
+ks363647.kimsufi.com:3128
+ks363886.kimsufi.com:3128
+ks36571.kimsufi.com:3128
+mail.deltacity.org:3128
+maintenance-gw1.duretelec.fr:80
+sds-23.hosteur.com:3128
+example.com:9999

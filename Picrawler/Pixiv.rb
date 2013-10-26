@@ -6,10 +6,13 @@
 class Picrawler::Pixiv
 	def initialize(options={})
 		@agent=Mechanize.new
+		@agent.robots=false
 		@agent.user_agent="Mozilla/5.0"
 		@encoding=options[:encoding]||raise
 		@sleep=options[:sleep]||3
 		@notifier=options[:notifier]
+		@enter_critical=options[:enter_critical]
+		@exit_critical=options[:exit_critical]
 	end
 
 	def list() return ["member","novel","tag","tagillust","tagcomic","tagnovel","response"] end
@@ -339,7 +342,7 @@ class Picrawler::Pixiv
 					#puts "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id
 					@agent.get("http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id, [], 'http://www.pixiv.net/') #2.1 syntax
 					html=@agent.page.body.resolve.split('<body')[1]
-					unless html=~/(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/[0-9a-zA-Z_-]+?\/#{id}_m\.(jpeg|jpg|png|gif))/m
+					unless html=~/(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/[0-9a-zA-Z_-]+?\/#{id}_m\.(jpeg|jpg|png|gif)(\?[0-9]+)?)/m
 						raise "[Developer's fault] Picture URL scheme changed"
 					end
 					base=$1
@@ -358,7 +361,7 @@ class Picrawler::Pixiv
 						sleep(@sleep)
 					elsif comic
 						#Dir.mkdir(id)
-						url_comic=base.gsub("#{id}_m.","#{id}_big_p0.")
+						url_comic=base.sub(/#{id}_([0-9a-zA-Z_-]*)m\./,"#{id}_\1big_p0.")
 						big=true
 						begin #big
 							@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
@@ -366,7 +369,7 @@ class Picrawler::Pixiv
 							@agent.page.save_as(id+"/"+id+"_big_p0."+ext) #as file is written after obtaining whole file, it should be less dangerous.
 							sleep(@sleep)
 						rescue #normal
-							url_comic=base.gsub("#{id}_m.","#{id}_p0.")
+							url_comic=base.sub(/#{id}_([0-9a-zA-Z_-]*)m\./,"#{id}_\1p0.")
 							big=false
 							# *** if exception is thown here, something is really wrong. ***
 							@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
@@ -382,7 +385,9 @@ class Picrawler::Pixiv
 								j+=1
 								url_comic=url_comic.gsub("_p"+(j-1).to_s+"."+ext,"_p"+j.to_s+"."+ext)
 								@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
+								@enter_critical.call
 								@agent.page.save_as(id+"/"+id+(big ? "_big":"")+"_p"+j.to_s+"."+ext) #as file is written after obtaining whole file, it should be less dangerous.
+								@exit_critical.call
 								sleep(@sleep)
 								@notifier.call sprintf("Page %d %d/%d Comic %d\r",@page,i+1,@content.length,j)
 							end
