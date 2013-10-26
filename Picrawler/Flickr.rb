@@ -10,9 +10,11 @@ class Picrawler::Flickr
 		@encoding=options[:encoding]||raise
 		@sleep=options[:sleep]||3
 		@notifier=options[:notifier]
+		@enter_critical=options[:enter_critical]
+		@exit_critical=options[:exit_critical]
 	end
 
-	def list() return ["member","search","tag"] end
+	def list() return ["member"] end
 
 	def open(user,pass,cookie)
 		return 1 #always success without login
@@ -32,14 +34,14 @@ class Picrawler::Flickr
 	def member_first(options={})
 		setup(options)
 		ret=member_next
-		if ret then @notifier.call 'Browsing http://www.flickr.com/photos/'+@arg+"\n" end
+		if ret then @notifier.call 'Browsing http://www.flickr.com/photos/'+@arg+"/?details=1\n" end
 		return ret
 	end
 
 	def member_next
 		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
-			@agent.get('http://www.flickr.com/photos/'+@arg+'/page'+@page.to_s+'/')
+			@agent.get('http://www.flickr.com/photos/'+@arg+'/page'+@page.to_s+'/?details=1')
 		rescue
 			return false
 		end
@@ -59,7 +61,7 @@ class Picrawler::Flickr
 		sleep(@sleep)
 		return true
 	end
-
+=begin
 	def tag_first(options={})
 		setup(options)
 		ret=tag_next
@@ -121,7 +123,7 @@ class Picrawler::Flickr
 		sleep(@sleep)
 		return true
 	end
-
+=end
 	def crawl
 		@content.each_with_index{|e,i| # e -> photostream URL
 			e=~/^.+?\/(\d+)\/sizes\/o\/in\/photostream\/$/m
@@ -135,7 +137,9 @@ class Picrawler::Flickr
 				ext=$2
 				sleep(1)
 				@agent.get(url, [], e) #2.1 syntax
-				@agent.page.save_as(num+'.'+ext) #as file is written after obtaining whole file, it should be less dangerous.
+				@enter_critical.call
+				@agent.page.save_as(num+'.'+ext)
+				@exit_critical.call
 				sleep(@sleep)
 			end
 			@notifier.call sprintf("Page %d %d/%d    \r",@page,i+1,@content.length)

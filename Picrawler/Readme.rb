@@ -20,7 +20,7 @@ mechanize (C) Michael Neumann / Aaron Patterson / Mike Dalessio / Eric Hodel / A
 [Note] website modules encoded in other than UTF-8 must encode strings properly or you will get wrong result.
 [Note] Cookie YAML cannot be merged between 1.8.x and 1.9.x.
 
-### You need Ruby 1.8.7 / 1.9.2 and Mechanize 2.1 or later. ###
+### You need Ruby 1.8.7 / 1.9.2 or later and Mechanize 2.1 or later. ###
 ### Sorry, but I use Mechanize#get 2.1 syntax.              ###
 As for specifying encoding in Ruby1.8, there should be several cases. Please be aware :p
 #Ruby 1.9.x (Debian/Ubuntu) - Now pcrawl defaults to ruby. You can get 1.9.3.194-1 package.
@@ -31,9 +31,10 @@ How to install:
 After installing RubyInstaller,
 gem install mechanize
 [OSX]
-After installing Xcode, ( if 10.6(SnowLeopard) or lower, use http://developer.apple.com/devcenter/download.action?path=/Developer_Tools/xcode_3.2.6_and_ios_sdk_4.3__final/xcode_3.2.6_and_ios_sdk_4.3.dmg )
+You need to installing Xcode Command Line Tools. ( if 10.6(SnowLeopard) or lower, use http://developer.apple.com/devcenter/download.action?path=/Developer_Tools/xcode_3.2.6_and_ios_sdk_4.3__final/xcode_3.2.6_and_ios_sdk_4.3.dmg )
+After that,
 sudo gem install mechanize
-Or you can use rvm to install Ruby 1.9.x or 2.0.x.
+Or you can use rvm to install Ruby 1.9.x or 2.0.x. (Note: OSX 10.9 is shipped with Ruby 2.0.0)
 [Debian/Ubuntu]
 sudo apt-get install ruby1.9.1
 sudo apt-get install ruby-mechanize
@@ -126,6 +127,10 @@ Fixed my-pix access.
 Fixed Zerochan search (queries with spaces were not sent properly)
 Reimplemented Fg driver.
 Added Pixiv2 driver (use only for research purpose!)
+0.31.131026
+Re-fixed my-pix access.
+Fixed Flickr (from now, only photostream is supported)
+If you hit Ctrl+C during writing file, program termination is delayed until writing is done.
 
 [Creative Commons CC0]
 Statement of Purpose
@@ -163,6 +168,8 @@ class Picrawler::Readme
 		@encoding=options[:encoding]||raise
 		@sleep=options[:sleep]||3
 		@notifier=options[:notifier]
+		@enter_critical=options[:enter_critical]
+		@exit_critical=options[:exit_critical]
 	end
 
 	def list() return [] end

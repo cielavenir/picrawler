@@ -10,6 +10,8 @@ class Picrawler::Zerochan
 		@encoding=options[:encoding]||raise
 		@sleep=options[:sleep]||3
 		@notifier=options[:notifier]
+		@enter_critical=options[:enter_critical]
+		@exit_critical=options[:exit_critical]
 	end
 
 	def list() return ["member","tag"] end
@@ -125,7 +127,9 @@ class Picrawler::Zerochan
 				if @fast then @seek_end=true end
 			else
 				@agent.get("http://static.zerochan.net/"+e[0], [], 'http://www.zerochan.net/') #2.1 syntax
-				@agent.page.save_as(e[1]) #as file is written after obtaining whole file, it should be less dangerous.
+				@enter_critical.call
+				@agent.page.save_as(e[1])
+				@exit_critical.call
 				sleep(@sleep)
 			end
 			@notifier.call sprintf("Page %d %d/%d    \r",@page,i+1,@content.length)

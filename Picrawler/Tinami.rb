@@ -25,6 +25,8 @@ class Picrawler::Tinami
 		@encoding=options[:encoding]||raise
 		@sleep=options[:sleep]||3
 		@notifier=options[:notifier]
+		@enter_critical=options[:enter_critical]
+		@exit_critical=options[:exit_critical]
 	end
 
 	def list() return ["member","tag"] end
@@ -144,7 +146,9 @@ class Picrawler::Tinami
 							if body=~/(http\:\/\/img.tinami.com\/illust\d*\/img\/\d+\/[0-9a-f]+\.(jpeg|jpg|png|gif))/
 								ext=$2
 								@agent.get($1, [], 'http://www.tinami.com/') #2.1 syntax
-								@agent.page.save_as(e+"."+ext) #as file is written after obtaining whole file, it should be less dangerous.
+								@enter_critical.call
+								@agent.page.save_as(e+"."+ext)
+								@exit_critical.call
 								sleep(@sleep)
 							else
 								raise "[Programmer's fault] cannot parse HTML:\n"+body

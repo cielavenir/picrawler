@@ -12,7 +12,7 @@ require "pathname" if RUBY_VERSION<'1.9'
 
 #require_relative shouldn't be used. Picrawler.rb might be called as symlink.
 
-Version = "0.26.130920"
+Version = "0.31.131026"
 
 class Object
 	public

@@ -35,9 +35,15 @@ class Picrawler::Pixiv_R18_example < Picrawler::Pixiv
 			if e=~/(\d+)件のブックマーク/
 				bookmark=$1.to_i
 			end
+=begin
 			if e=~/^(\d+).+?(http\:\/\/img.+?\.pixiv\.net\/img[0-9]{2,}\/img\/.+?\/\d+_s\.(jpeg|jpg|png|gif))/m #(?:\?[0-9]+)?)/m #just splitting, so I don't have to consider ?[0-9]+ stuff.
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push([$1, $2, $3])
+			end
+=end
+			if e=~/^(\d+)/
+				if @bookmark>0 && bookmark<@bookmark then next end
+				@content.push($1)
 			end
 		}
 		if @content.length<1 then return false end

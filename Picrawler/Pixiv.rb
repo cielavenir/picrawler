@@ -329,7 +329,9 @@ class Picrawler::Pixiv
 				else
 					@agent.get("http://www.pixiv.net/novel/show.php?id="+e, [], 'http://www.pixiv.net/') #2.1 syntax
 					text=@agent.page.body.split(%Q(id="novel_text">))[1].split("</textarea>")[0]
+					@enter_critical.call
 					File.open(e+".txt","wb"){|f| f.write(text)}
+					@exit_critical.call
 					sleep(@sleep)
 				end
 				@notifier.call sprintf("Page %d %d/%d              \r",@page,i+1,@content.length) 
@@ -357,7 +359,9 @@ class Picrawler::Pixiv
 						#@agent.get("http://www.pixiv.net/member_illust.php?mode=big&illust_id="+id, [], "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id)
 						#sleep(1)
 						@agent.get(base.gsub("_m.","."), [], "http://www.pixiv.net/member_illust.php?mode=big&illust_id="+id) #2.1 syntax
-						@agent.page.save_as(id+"."+ext) #as file is written after obtaining whole file, it should be less dangerous.
+						@enter_critical.call
+						@agent.page.save_as(id+"."+ext)
+						@exit_critical.call
 						sleep(@sleep)
 					elsif comic
 						#Dir.mkdir(id)
@@ -366,7 +370,9 @@ class Picrawler::Pixiv
 						begin #big
 							@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
 							Dir.mkdir(id)
-							@agent.page.save_as(id+"/"+id+"_big_p0."+ext) #as file is written after obtaining whole file, it should be less dangerous.
+							@enter_critical.call
+							@agent.page.save_as(id+"/"+id+"_big_p0."+ext)
+							@exit_critical.call
 							sleep(@sleep)
 						rescue #normal
 							url_comic=base.sub(/#{id}_([0-9a-zA-Z_-]*)m\./,"#{id}_\1p0.")
@@ -374,7 +380,9 @@ class Picrawler::Pixiv
 							# *** if exception is thown here, something is really wrong. ***
 							@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
 							Dir.mkdir(id)
-							@agent.page.save_as(id+"/"+id+"_p0."+ext) #as file is written after obtaining whole file, it should be less dangerous.
+							@enter_critical.call
+							@agent.page.save_as(id+"/"+id+"_p0."+ext)
+							@exit_critical.call
 							sleep(@sleep)
 						end
 						@notifier.call sprintf("Page %d %d/%d Comic 0\r",@page,i+1,@content.length)
@@ -386,7 +394,7 @@ class Picrawler::Pixiv
 								url_comic=url_comic.gsub("_p"+(j-1).to_s+"."+ext,"_p"+j.to_s+"."+ext)
 								@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
 								@enter_critical.call
-								@agent.page.save_as(id+"/"+id+(big ? "_big":"")+"_p"+j.to_s+"."+ext) #as file is written after obtaining whole file, it should be less dangerous.
+								@agent.page.save_as(id+"/"+id+(big ? "_big":"")+"_p"+j.to_s+"."+ext)
 								@exit_critical.call
 								sleep(@sleep)
 								@notifier.call sprintf("Page %d %d/%d Comic %d\r",@page,i+1,@content.length,j)

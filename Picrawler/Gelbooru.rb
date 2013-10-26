@@ -10,6 +10,8 @@ class Picrawler::Gelbooru
 		@encoding=options[:encoding]||raise
 		@sleep=options[:sleep]||3
 		@notifier=options[:notifier]
+		@enter_critical=options[:enter_critical]
+		@exit_critical=options[:exit_critical]
 	end
 
 	def list() return ["member","tag"] end
@@ -87,9 +89,9 @@ class Picrawler::Gelbooru
 		array.each{|e|
 			bookmark=0
 			#if e=~/(\d+).+?(http\:\/\/img.+?\.gelbooru\.com\/thumbs\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
-			if e=~/(\d+).+?(http\:\/\/cdn1\.gelbooru\.com\/thumbs\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
+			if e=~/(\d+).+?(http\:\/\/simg\.gelbooru\.com\/thumbs\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
 				if @bookmark>0 && bookmark<@bookmark then next end
-				@content.push([$1+'.'+$3, $2.sub("/thumbnail_","/").sub("/thumbs/","/images/").sub("simg","cdn2")])
+				@content.push([$1+'.'+$3, $2.sub("/thumbnail_","/").sub("/thumbs/","/images/")])
 			end
 		}
 		@page+=1
@@ -108,7 +110,9 @@ class Picrawler::Gelbooru
 				#	if ext=="err" then raise "[Programmer's fault: failed "+e[0] end
 				#	begin
 						@agent.get(e[1], [], 'http://gelbooru.com/') #2.1 syntax
-						@agent.page.save_as(e[0]) #as file is written after obtaining whole file, it should be less dangerous.
+						@enter_critical.call
+						@agent.page.save_as(e[0])
+						@exit_critical.call
 						sleep(@sleep)
 				#	rescue
 				#		sleep(1)

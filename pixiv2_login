@@ -126,13 +126,4 @@ puts 'Failed...'
 #Proxy Entries
 #host:port
 __END__
-46-105-42-93.kimsufi.com:3128
-94.247.25.163:80
-athene.ssh.onlysavvy.com:3128
-ks363647.kimsufi.com:3128
-ks363886.kimsufi.com:3128
-ks36571.kimsufi.com:3128
-mail.deltacity.org:3128
-maintenance-gw1.duretelec.fr:80
-sds-23.hosteur.com:3128
 example.com:9999

@@ -11,6 +11,8 @@ class Picrawler::NicoSeiga
 		@encoding=options[:encoding]||raise
 		@sleep=options[:sleep]||3
 		@notifier=options[:notifier]
+		@enter_critical=options[:enter_critical]
+		@exit_critical=options[:exit_critical]
 	end
 
 	def list() return ["member","tag"] end
@@ -131,7 +133,9 @@ class Picrawler::NicoSeiga
 				else
 					raise "[Developer's fault] must add crawl entry for "+@agent.page.response["content-type"]
 				end
-				@agent.page.save_as(e+ext) #as file is written after obtaining whole file, it should be less dangerous.
+				@enter_critical.call
+				@agent.page.save_as(e+ext)
+				@exit_critical.call
 				sleep(@sleep)
 			end
 			@notifier.call sprintf("Page %d %d/%d    \r",@page,i+1,@content.length)

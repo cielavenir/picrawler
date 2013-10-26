@@ -10,6 +10,8 @@ class Picrawler::Danbooru
 		@encoding=options[:encoding]||raise
 		@sleep=options[:sleep]||3
 		@notifier=options[:notifier]
+		@enter_critical=options[:enter_critical]
+		@exit_critical=options[:exit_critical]
 	end
 
 	def list() return ["member","tag"] end
@@ -108,10 +110,12 @@ class Picrawler::Danbooru
 				if @fast then @seek_end=true end
 			else
 				["jpg","png","gif","jpeg","err"].each{|ext|
-					if ext=="err" then raise "[Programmer's fault: failed "+e[0] end
+					if ext=="err" then raise "[Programmer's fault] failed "+e[0] end
 					begin
 						@agent.get("http://danbooru.donmai.us/data/"+e[1]+"."+ext, [], 'http://danbooru.donmai.us/') #2.1 syntax
-						@agent.page.save_as(e[0]+"."+ext) #as file is written after obtaining whole file, it should be less dangerous.
+						@enter_critical.call
+						@agent.page.save_as(e[0]+"."+ext)
+						@exit_critical.call
 						sleep(@sleep)
 					rescue
 						sleep(1)
