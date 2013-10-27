@@ -135,6 +135,8 @@ If you hit Ctrl+C during writing file, program termination is delayed until writ
 Fix red (very sorry!)
 0.32a.131027
 Refix red (again sorry)
+0.32b.131028
+Fixed Gelbooru again
 
 [Creative Commons CC0]
 Statement of Purpose
