@@ -133,6 +133,8 @@ Fixed Flickr (from now, only photostream is supported)
 If you hit Ctrl+C during writing file, program termination is delayed until writing is done.
 0.32.131027
 Fix red (very sorry!)
+0.32a.131027
+Refix red (again sorry)
 
 [Creative Commons CC0]
 Statement of Purpose
