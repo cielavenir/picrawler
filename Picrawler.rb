@@ -320,8 +320,8 @@ class Picrawler
 			:encoding=>@encoding,
 			:sleep=>sleeptime,
 			:notifier=>@notifier,
-			:enter_critical=:method(:enter_critical),
-			:exit_critical=:method(:exit_critical),
+			:enter_critical=>method(:enter_critical),
+			:exit_critical=>method(:exit_critical),
 		})
 		ret=@pic.open(@ini[service]["user"],@ini[service]["pass"],@cookie)	
 		if ret==-1
@@ -344,7 +344,13 @@ class Picrawler
 			return []
 		end
 		require File.expand_path(__FILE__.realpath.dirname+"/Picrawler/"+service+".rb")
-		@pic=Picrawler.const_get(service).new({:encoding=>@encoding,:sleep=>-1,:notifier=>@notifier})
+		@pic=Picrawler.const_get(service).new({
+			:encoding=>@encoding,
+			:sleep=>-1,
+			:notifier=>@notifier,
+			:enter_critical=>method(:enter_critical),
+			:exit_critical=>method(:exit_critical),
+		})
 		return @pic.list
 	end
 
