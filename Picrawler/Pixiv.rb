@@ -365,7 +365,7 @@ class Picrawler::Pixiv
 						sleep(@sleep)
 					elsif comic
 						#Dir.mkdir(id)
-						url_comic=base.sub(/#{id}_([0-9a-zA-Z_-]*)m\./,"#{id}_\1big_p0.")
+						url_comic=base.sub(/#{id}_([0-9a-zA-Z_-]*)m\./,"#{id}_\\1big_p0.")
 						big=true
 						begin #big
 							@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
@@ -375,7 +375,7 @@ class Picrawler::Pixiv
 							@exit_critical.call
 							sleep(@sleep)
 						rescue #normal
-							url_comic=base.sub(/#{id}_([0-9a-zA-Z_-]*)m\./,"#{id}_\1p0.")
+							url_comic=base.sub(/#{id}_([0-9a-zA-Z_-]*)m\./,"#{id}_\\1p0.")
 							big=false
 							# *** if exception is thown here, something is really wrong. ***
 							@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
