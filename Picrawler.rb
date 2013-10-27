@@ -356,13 +356,13 @@ class Picrawler
 
 	def enter_critical
 		@__signal_int__=trap('INT'){@__signal_needtobreak__=true}
-		@__signal_break__=trap('BREAK'){@__signal_needtobreak__=true}
+		#@__signal_break__=trap('BREAK'){@__signal_needtobreak__=true}
 		@__signal_term__=trap('TERM'){@__signal_needtobreak__=true}
 		#@__signal_hup__=trap('HUP'){@__signal_needtobreak__=true} #in case SSH?
 	end
 	def exit_critical
 		trap('INT',@__signal_int__)
-		trap('BREAK',@__signal_break__)
+		#trap('BREAK',@__signal_break__)
 		trap('TERM',@__signal_term__)
 		#trap('HUP',@__signal_hup__)
 		if @__signal_needtobreak__
