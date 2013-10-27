@@ -131,6 +131,8 @@ Added Pixiv2 driver (use only for research purpose!)
 Re-fixed my-pix access.
 Fixed Flickr (from now, only photostream is supported)
 If you hit Ctrl+C during writing file, program termination is delayed until writing is done.
+0.32.131027
+Fix red (very sorry!)
 
 [Creative Commons CC0]
 Statement of Purpose

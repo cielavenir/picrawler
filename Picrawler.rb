@@ -12,7 +12,7 @@ require "pathname" if RUBY_VERSION<'1.9'
 
 #require_relative shouldn't be used. Picrawler.rb might be called as symlink.
 
-Version = "0.31.131026"
+Version = "0.32.131027"
 
 class Object
 	public
@@ -316,7 +316,13 @@ class Picrawler
 		end
 
 		require File.expand_path(__FILE__.realpath.dirname+"/Picrawler/"+service+".rb")
-		@pic=Picrawler.const_get(service).new({:encoding=>@encoding,:sleep=>sleeptime,:notifier=>@notifier})
+		@pic=Picrawler.const_get(service).new({
+			:encoding=>@encoding,
+			:sleep=>sleeptime,
+			:notifier=>@notifier,
+			:enter_critical=:method(:enter_critical),
+			:exit_critical=:method(:exit_critical),
+		})
 		ret=@pic.open(@ini[service]["user"],@ini[service]["pass"],@cookie)	
 		if ret==-1
 			@notifier.call "[Error] Login Failed.\n"
@@ -363,8 +369,6 @@ class Picrawler
 	#dynamic loading
 	def call_first(mode,options={})
 		@mode=mode
-		options[:enter_critical]=method(:enter_critical)
-		options[:exit_critical]=method(:exit_critical)
 		return @pic.__send__(@mode+"_first",options)
 	end
 	def call_next() return @pic.__send__(@mode+"_next") end
