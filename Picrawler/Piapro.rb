@@ -19,7 +19,7 @@ class Picrawler::Piapro
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["piapro.jp","/",'piapror'])
+			if @agent.cookie_jar.jar.fetch_nested(*["piapro.jp","/",'piapror'])
 				unless @agent.cookie_jar.jar["piapro.jp"]["/"]['piapror'].expired? then return 1 end #use cookie
 			end
 		end

@@ -185,7 +185,7 @@ class Picrawler::Readme
 
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["xxx","/","xxx"])
+			if @agent.cookie_jar.jar.fetch_nested(*["xxx","/","xxx"])
 				unless @agent.cookie_jar.jar["xxx"]["/"]["xxx"].expired? then return 1 end #use cookie
 			end
 		end

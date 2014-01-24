@@ -12,7 +12,7 @@ require "pathname" if RUBY_VERSION<'1.9'
 
 #require_relative shouldn't be used. Picrawler.rb might be called as symlink.
 
-Version = "0.32b.131028"
+Version = "0.32c.140124"
 
 class Object
 	public
@@ -242,12 +242,14 @@ if RUBY_VERSION < '1.9.0' then
 end
 
 class Hash
-	def exists_rec?(a)
-		#if a.length<1 then return false
-		if !self.include?(a[0]) then return nil end           #if not found
-		if a.length==1 then return self[a[0]] end             #if found and last
-		if !self[a[0]].instance_of?(Hash) then return nil end #if not last and child not hash
-		return self[a[0]].exists_rec?(a[1..-1])               #check child
+	#nil safe version of Hash#[].
+	# h.fetch_nested(*['hello','world']) is basically the same as h['hello'].try.send(:[],'world').
+	def fetch_nested(*keys)
+		begin
+			keys.reduce(self){|accum, k| accum.fetch(k)}
+		rescue (RUBY_VERSION<'1.9' ? IndexError : KeyError)
+			block_given? ? yield(*keys) : nil
+		end
 	end
 end
 ###Libraries end

@@ -20,7 +20,7 @@ class Picrawler::Fg
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["www.fg-site.net","/","wordpress_logged_in_0ec92a783201088155448925f5e07044"])
+			if @agent.cookie_jar.jar.fetch_nested(*["www.fg-site.net","/","wordpress_logged_in_0ec92a783201088155448925f5e07044"])
 				unless @agent.cookie_jar.jar["www.fg-site.net"]["/"]["wordpress_logged_in_0ec92a783201088155448925f5e07044"].expired? then return 1 end #use cookie
 			end
 		end

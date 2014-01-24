@@ -19,7 +19,7 @@ class Picrawler::Zerochan
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["zerochan.net","/","z_hash"])
+			if @agent.cookie_jar.jar.fetch_nested(*["zerochan.net","/","z_hash"])
 				unless @agent.cookie_jar.jar["zerochan.net"]["/"]["z_hash"].expired? then return 1 end #use cookie
 			end
 		end

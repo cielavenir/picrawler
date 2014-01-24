@@ -20,7 +20,7 @@ class Picrawler::Pixiv
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["pixiv.net","/","PHPSESSID"])
+			if @agent.cookie_jar.jar.fetch_nested(*["pixiv.net","/","PHPSESSID"])
 				unless @agent.cookie_jar.jar["pixiv.net"]["/"]["PHPSESSID"].expired? then return 1 end #use cookie
 			end
 		end

@@ -19,7 +19,7 @@ class Picrawler::PiXA
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["www.pixa.cc","/","_imagesns2_session"])
+			if @agent.cookie_jar.jar.fetch_nested(*["www.pixa.cc","/","_imagesns2_session"])
 				unless @agent.cookie_jar.jar["www.pixa.cc"]["/"]["_imagesns2_session"].expired? then return 1 end #use cookie
 			end
 		end

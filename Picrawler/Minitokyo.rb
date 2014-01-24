@@ -20,7 +20,7 @@ class Picrawler::Minitokyo
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["minitokyo.net","/","minitokyo_hash"])
+			if @agent.cookie_jar.jar.fetch_nested(*["minitokyo.net","/","minitokyo_hash"])
 				unless @agent.cookie_jar.jar["minitokyo.net"]["/"]["minitokyo_hash"].expired? then return 1 end #use cookie
 			end
 		end

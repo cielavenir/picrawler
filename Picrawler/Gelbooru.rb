@@ -19,7 +19,7 @@ class Picrawler::Gelbooru
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["gelbooru.com","/","__cfduid"])
+			if @agent.cookie_jar.jar.fetch_nested(*["gelbooru.com","/","__cfduid"])
 				unless @agent.cookie_jar.jar["gelbooru.com"]["/"]["__cfduid"].expired? then return 1 end #use cookie
 			end
 		end

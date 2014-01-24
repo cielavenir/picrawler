@@ -20,7 +20,7 @@ class Picrawler::FgOld
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["fg-site.net","/","my_id"])
+			if @agent.cookie_jar.jar.fetch_nested(*["fg-site.net","/","my_id"])
 				unless @agent.cookie_jar.jar["fg-site.net"]["/"]["my_id"].expired? then return 1 end #use cookie
 			end
 		end

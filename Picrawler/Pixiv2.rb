@@ -20,7 +20,7 @@ class Picrawler::Pixiv2
 	def open(user,pass,cookie)
 		if File.exist?(cookie)
 			@agent.cookie_jar.load(cookie)
-			if @agent.cookie_jar.jar.exists_rec?(["pixiv.com","/","_pixiv-universe_session"])
+			if @agent.cookie_jar.jar.fetch_nested(*["pixiv.com","/","_pixiv-universe_session"])
 				unless @agent.cookie_jar.jar["pixiv.com"]["/"]["_pixiv-universe_session"].expired? then return 1 end #use cookie
 			end
 		end
@@ -37,7 +37,7 @@ class Picrawler::Pixiv2
 		end
 		#auth failed.
 =end
-		raise "Since usual login isn't working, you need to get cookie using pixiv2_login command."
+		@notifier.call "Since usual login isn't working, you need to get cookie using pixiv2_login command."
 		return -1
 	end
 
