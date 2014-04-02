@@ -34,14 +34,14 @@ class Picrawler::Flickr
 	def member_first(options={})
 		setup(options)
 		ret=member_next
-		if ret then @notifier.call 'Browsing http://www.flickr.com/photos/'+@arg+"/?details=1\n" end
+		if ret then @notifier.call 'Browsing https://www.flickr.com/photos/'+@arg+"/?details=1\n" end
 		return ret
 	end
 
 	def member_next
 		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
-			@agent.get('http://www.flickr.com/photos/'+@arg+'/page'+@page.to_s+'/?details=1')
+			@agent.get('https://www.flickr.com/photos/'+@arg+'/page'+@page.to_s+'/?details=1')
 		rescue
 			return false
 		end
@@ -54,7 +54,7 @@ class Picrawler::Flickr
 			bookmark=0
 
 			if e=~/^(.+?)\/in\/photostream\"/m
-				@content.push("http://www.flickr.com/photos/"+$1+"/sizes/o/in/photostream/")
+				@content.push("https://www.flickr.com/photos/"+$1+"/sizes/o/in/photostream/")
 			end
 		}
 		if @content.length<1 then return false end
@@ -65,14 +65,14 @@ class Picrawler::Flickr
 	def tag_first(options={})
 		setup(options)
 		ret=tag_next
-		if ret then @notifier.call 'Browsing http://www.flickr.com/search/?w=all&mt=photos&ct=5&m=tags&q='+@arg+"\n" end
+		if ret then @notifier.call 'Browsing https://www.flickr.com/search/?w=all&mt=photos&ct=5&m=tags&q='+@arg+"\n" end
 		return ret
 	end
 
 	def tag_next
 		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
-			@agent.get('http://www.flickr.com/search/?w=all&mt=photos&ct=5&m=tags&q='+@arg.uriEncode+'&page='+@page.to_s)
+			@agent.get('https://www.flickr.com/search/?w=all&mt=photos&ct=5&m=tags&q='+@arg.uriEncode+'&page='+@page.to_s)
 		rescue
 			return false
 		end
@@ -85,7 +85,7 @@ class Picrawler::Flickr
 			bookmark=0
 
 			if e=~/^([^\"]+)/m
-				@content.push("http://www.flickr.com/photos/"+$1+"sizes/o/in/photostream/")
+				@content.push("https://www.flickr.com/photos/"+$1+"/sizes/o/in/photostream/")
 			end
 		}
 		if @content.length<1 then return false end
@@ -96,14 +96,14 @@ class Picrawler::Flickr
 	def search_first(options={})
 		setup(options)
 		ret=tag_next
-		if ret then @notifier.call 'Browsing http://www.flickr.com/search/?w=all&mt=photos&ct=5&m=text&q='+@arg+"\n" end
+		if ret then @notifier.call 'Browsing https://www.flickr.com/search/?w=all&mt=photos&ct=5&m=text&q='+@arg+"\n" end
 		return ret
 	end
 
 	def search_next
 		if @page==@stop||@seek_end then return false end;@page+=1
 		begin
-			@agent.get('http://www.flickr.com/search/?w=all&mt=photos&ct=5&m=text&q='+@arg.uriEncode+'&page='+@page.to_s)
+			@agent.get('https://www.flickr.com/search/?w=all&mt=photos&ct=5&m=text&q='+@arg.uriEncode+'&page='+@page.to_s)
 		rescue
 			return false
 		end
@@ -116,7 +116,7 @@ class Picrawler::Flickr
 			bookmark=0
 
 			if e=~/^([^\"]+)/m
-				@content.push("http://www.flickr.com/photos/"+$1+"sizes/o/in/photostream/")
+				@content.push("https://www.flickr.com/photos/"+$1+"/sizes/o/in/photostream/")
 			end
 		}
 		if @content.length<1 then return false end
@@ -131,8 +131,8 @@ class Picrawler::Flickr
 			if @filter.include?(num)
 				if @fast then @seek_end=true end
 			else
-				@agent.get(e, [], 'http://www.flickr.com/') #2.1 syntax
-				@agent.page.body.resolve=~/\<a href=\"(http:\/\/farm\d+.staticflickr.com\/\d+\/.+?_d\.([a-z]+?)(?:\?.+)?)\"\>/
+				@agent.get(e, [], 'https://www.flickr.com/') #2.1 syntax
+				@agent.page.body.resolve=~/\<a href=\"(https:\/\/farm\d+.staticflickr.com\/\d+\/.+?_d\.([a-z]+?)(?:\?.+)?)\"\>/
 				url=$1
 				ext=$2
 				sleep(1)
