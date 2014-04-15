@@ -66,13 +66,13 @@ class Picrawler::DeviantART
 
 		unless @agent.page.body.resolve=~/\<a class="disabled"\>Next\<\/a\>/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.split("<span class=\"tt-w\">")
+		array=@agent.page.body.resolve.split(/<span class=\"tt-w\".*?>/)
 		array.shift
 		array.each{|e|
 			bookmark=0
 			if e=~/src\=\"(http\:\/\/.+?\.deviantart\.net\/fs\d{2}\/.+?\/([^\/]+.(jpeg|jpg|png|gif)))/ #collect_rid\=\"1\:\d+\" -> numeric ID
 				if @bookmark>0 && bookmark<@bookmark then next end
-				@content.push([$2,$1.sub("/150/","/")])
+				@content.push([$2,$1.sub("/150/","/").sub("/200H/","/")])
 			end
 		}
 		@page+=1
@@ -98,14 +98,14 @@ class Picrawler::DeviantART
 
 		unless @agent.page.body.resolve=~/\<a class="disabled"\>Next\<\/a\>/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.split("<span class=\"tt-w\">")
+		array=@agent.page.body.resolve.split(/<span class=\"tt-w\".*?>/)
 		array.shift
 		array.each_with_index{|e,i|
 			if i==24 then break end #kills daily deviation stuff
 			bookmark=0
 			if e=~/src\=\"(http\:\/\/.+?\.deviantart\.net\/fs\d{2}\/.+?\/([^\/]+.(jpeg|jpg|png|gif)))/
 				if @bookmark>0 && bookmark<@bookmark then next end
-				@content.push([$2,$1.sub("/150/","/")])
+				@content.push([$2,$1.sub("/150/","/").sub("/200H/","/")])
 			end
 		}
 		@page+=1
