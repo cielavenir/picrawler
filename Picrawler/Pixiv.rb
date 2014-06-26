@@ -349,7 +349,7 @@ class Picrawler::Pixiv
 					end
 					base=$1
 					ext=$2
-					illust=html.index('&type=ugoira')
+					ugoira=html.index('&type=ugoira')
 					if ugoira
 						@notifier.call '[Warn] ugoira support is disabled for a while'
 						next
