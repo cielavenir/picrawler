@@ -27,10 +27,11 @@ class Picrawler::NicoSeiga
 
 		#normal auth.
 		form = @agent.get('https://secure.nicovideo.jp/secure/login_form').forms[0]
-		form.mail = user
+		form.mail_tel = user
 		form.password = pass
 		#form.checkbox_with("remember_me").check
-		if @agent.submit(form).body.resolve =~ /ログアウト/
+		@agent.submit(form)
+		if @agent.page.body.resolve =~ /ログアウト/ || @agent.page.body.resolve =~ /Log out/
 			@agent.cookie_jar.save_as(cookie)
 			return 0
 		end
@@ -66,7 +67,7 @@ class Picrawler::NicoSeiga
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.split("<div class=\"center_img  center_img_size_160\"><a href=\"/seiga/") #bah.
+		array=@agent.page.body.resolve.split(%Q(<li class="list_item no_trim"><a href="/seiga/)) #bah.
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -100,7 +101,7 @@ class Picrawler::NicoSeiga
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.split("<div class=\"center_img  center_img_size_160\"><a href=\"/seiga/") #bah.
+		array=@agent.page.body.resolve.split(%Q(<li class="list_item no_trim"><a href="/seiga/)) #bah.
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -122,7 +123,9 @@ class Picrawler::NicoSeiga
 			if @filter.include?(e)
 				if @fast then @seek_end=true end
 			else
-				@agent.get("http://seiga.nicovideo.jp/image/source?id="+e, [], 'http://seiga.nicovideo.jp/') #2.1 syntax
+				@agent.get("http://seiga.nicovideo.jp/image/source/"+e, [], 'http://seiga.nicovideo.jp/') #2.1 syntax
+				@agent.page.body.resolve=~/\<img src=\"(.+)\" data-watch_url=/
+				@agent.get("http://lohas.nicoseiga.jp"+$1, [], "http://seiga.nicovideo.jp/image/source/"+e) #2.1 syntax
 				ext=""
 				if @agent.page.response["content-type"]=="image/jpeg"
 					ext=".jpg"

@@ -349,6 +349,11 @@ class Picrawler::Pixiv
 					end
 					base=$1
 					ext=$2
+					illust=html.index('&type=ugoira')
+					if ugoira
+						@notifier.call '[Warn] ugoira support is disabled for a while'
+						next
+					end
 					illust=html.index('member_illust.php?mode=big&amp;illust_id='+id)
 					comic=html.index('member_illust.php?mode=manga&amp;illust_id='+id)
 					if (illust&&comic) || (!illust&&!comic)
