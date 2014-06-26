@@ -354,7 +354,7 @@ class Picrawler::Pixiv
 						sleep(1)
 						zip=zip_open(@agent.page.body)
 						if !zip
-							@notifier.call "[Warn] Cannot extract ugoira. Please install gem: zip or zipruby.\n"
+							@notifier.call "[Warn] Cannot extract ugoira. Please install gem: rubyzip or zipruby.\n"
 							next
 						end
 						Dir.mkdir(id)
