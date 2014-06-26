@@ -137,6 +137,11 @@ Fix red (very sorry!)
 Refix red (again sorry)
 0.32b.131028
 Fixed Gelbooru again
+0.32c.140124
+Minor tweak.
+0.33.140626
+Added Pixiv ugoira support.
+Fixed NicoSeiga/DeviantART/Flickr.
 
 [Creative Commons CC0]
 Statement of Purpose

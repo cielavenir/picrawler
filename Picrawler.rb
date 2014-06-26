@@ -10,10 +10,24 @@ require "uri"
 require "fileutils"
 require "pathname" if RUBY_VERSION<'1.9'
 
+require 'stringio'
+begin
+	require 'zip'
+	ZIP=:rubyzip
+rescue LoadError
+	begin
+		require 'zipruby'
+		ZIP=:zipruby
+	rescue LoadError
+		ZIP=nil
+	end
+end
+
 #require_relative shouldn't be used. Picrawler.rb might be called as symlink.
 
-Version = "0.32c.140124"
+Version = "0.33.140626"
 
+###Libraries
 class Object
 	public
 	def assureArray
@@ -62,7 +76,6 @@ if Mechanize::VERSION >= '2.2'
 	end
 end
 
-###Libraries
 #Ini Reader/Writer http://d.hatena.ne.jp/white-azalea/20081109/1226244784
 class Ini
 	def initialize(targetFileName = "./default.ini")
@@ -250,6 +263,49 @@ class Hash
 		rescue (RUBY_VERSION<'1.9' ? IndexError : KeyError)
 			block_given? ? yield(*keys) : nil
 		end
+	end
+end
+
+if ZIP==:rubyzip
+	def zip_open(buffer)
+		Zip::InputStream.open(StringIO.new(buffer))
+	end
+	def zip_close(hzip)
+		hzip.close
+	end
+	def zip_decode(hzip,name)
+		hzip.rewind
+		while entry=hzip.get_next_entry
+			if entry.name==name
+				return hzip.read
+			end
+		end
+		nil
+	end
+elsif ZIP==:zipruby
+	def zip_open(buffer)
+		Zip::Archive.open_buffer(buffer)
+	end
+	def zip_close(hzip)
+		hzip.close
+	end
+	def zip_decode(hzip,name)
+		hzip.each{|entry|
+			if entry.name==name
+				return entry.read
+			end
+		}
+		nil
+	end
+else
+	def zip_open(buffer)
+		nil
+	end
+	def zip_close(hzip)
+		nil
+	end
+	def zip_decode(hzip,name)
+		raise 'zip not available'
 	end
 end
 ###Libraries end

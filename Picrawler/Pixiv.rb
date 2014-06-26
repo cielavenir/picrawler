@@ -3,6 +3,8 @@
 #Picrawler under CC0
 #Picrawler::Pixiv module
 
+require 'json'
+
 class Picrawler::Pixiv
 	def initialize(options={})
 		@agent=Mechanize.new
@@ -344,16 +346,31 @@ class Picrawler::Pixiv
 					#puts "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id
 					@agent.get("http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id, [], 'http://www.pixiv.net/') #2.1 syntax
 					html=@agent.page.body.resolve.split('<body')[1]
+					ugoira=html.index('pixiv.context.ugokuIllustFullscreenData  = ')
+					if ugoira
+						html=~/pixiv.context.ugokuIllustFullscreenData  = (.+?);/
+						json=JSON.parse($1)
+						@agent.get(json['src'], [], "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id) #2.1 syntax
+						sleep(1)
+						zip=zip_open(@agent.page.body)
+						if !zip
+							@notifier.call "[Warn] Cannot extract ugoira. Please install gem: zip or zipruby.\n"
+							next
+						end
+						Dir.mkdir(id)
+						json['frames'].each{|e|
+							buffer=zip_decode(zip,e['file'])
+							File.open(id+'/'+e['file'],'wb'){|f|f.syswrite(buffer)}
+						}
+						@notifier.call sprintf("Page %d %d/%d              \r",@page,i+1,@content.length)
+						next
+					end
+
 					unless html=~/(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/[0-9a-zA-Z_-]+?\/#{id}_m\.(jpeg|jpg|png|gif)(\?[0-9]+)?)/m
 						raise "[Developer's fault] Picture URL scheme changed"
 					end
 					base=$1
 					ext=$2
-					ugoira=html.index('&type=ugoira')
-					if ugoira
-						@notifier.call '[Warn] ugoira support is disabled for a while'
-						next
-					end
 					illust=html.index('member_illust.php?mode=big&amp;illust_id='+id)
 					comic=html.index('member_illust.php?mode=manga&amp;illust_id='+id)
 					if (illust&&comic) || (!illust&&!comic)
