@@ -142,6 +142,8 @@ Minor tweak.
 0.33.140626
 Added Pixiv ugoira support.
 Fixed NicoSeiga/DeviantART/Flickr.
+0.34.141008
+Fixed Pixiv/Gelbooru/Minitokyo.
 
 [Creative Commons CC0]
 Statement of Purpose

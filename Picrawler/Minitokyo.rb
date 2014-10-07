@@ -57,7 +57,7 @@ class Picrawler::Minitokyo
 		if ret then @notifier.call 'Browsing http://browse.minitokyo.net/gallery?tid='+@arg+'&index='+@index+'&order=id'+"\n" end
 		return ret
 	end
-	def tidwall_first(options={}) return tid_first_main('1','<dl class="wallpapers">','</dt>',options) end
+	def tidwall_first(options={}) return tid_first_main('1','<ul class="wallpapers">','</div>',options) end
 	def tidscan_first(options={}) return tid_first_main('3','<ul class="scans">','</li>',options) end
 	alias_method :tid_first, :tidscan_first
 
@@ -77,7 +77,7 @@ class Picrawler::Minitokyo
 		array.each{|e|
 			bookmark=0
 
-			if e=~/src=\"http\:\/\/static[0-9]*\.minitokyo\.net\/thumbs\/([0-9a-z\/]+)\.(jpeg|jpg|png|gif)/m
+			if e=~/src=\"http\:\/\/static[0-9]*\.minitokyo\.net\/(?:thumbs|view)\/([0-9a-z\/]+)\.(jpeg|jpg|png|gif)/m
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push($1+"."+$2)
 			end

@@ -69,7 +69,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.split("<a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -143,7 +143,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("<a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -184,7 +184,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("<a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -225,7 +225,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("<a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -366,7 +366,10 @@ class Picrawler::Pixiv
 						next
 					end
 
-					unless html=~/(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/[0-9a-zA-Z_-]+?\/#{id}_m\.(jpeg|jpg|png|gif)(\?[0-9]+)?)/m
+					unless
+						html=~/(http\:\/\/i[0-9]*\.pixiv\.net\/img[0-9]{2,}\/img\/[0-9a-zA-Z_-]+?\/#{id}_m\.(jpeg|jpg|png|gif)(\?[0-9]+)?)/m ||
+						html=~/(http\:\/\/i[0-9]*\.pixiv\.net\/c\/600x600\/img-master\/img\/[0-9\/]+?\/#{id}_p0_master[0-9]+\.(jpeg|jpg|png|gif)(\?[0-9]+)?)/m
+					then
 						raise "[Developer's fault] Picture URL scheme changed"
 					end
 					base=$1
@@ -378,9 +381,10 @@ class Picrawler::Pixiv
 					end
 					sleep(1)
 					if illust
-						#@agent.get("http://www.pixiv.net/member_illust.php?mode=big&illust_id="+id, [], "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id)
-						#sleep(1)
-						@agent.get(base.gsub("_m.","."), [], "http://www.pixiv.net/member_illust.php?mode=big&illust_id="+id) #2.1 syntax
+						@agent.get("http://www.pixiv.net/member_illust.php?mode=big&illust_id="+id, [], "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id) #2.1 syntax
+						sleep(1)
+						@agent.page.body=~/img src="(.+?)"/
+						@agent.get($1, [], "http://www.pixiv.net/member_illust.php?mode=big&illust_id="+id) #2.1 syntax
 						@enter_critical.call
 						@agent.page.save_as(id+"."+ext)
 						@exit_critical.call
@@ -415,6 +419,7 @@ class Picrawler::Pixiv
 								j+=1
 								url_comic=url_comic.gsub("_p"+(j-1).to_s+"."+ext,"_p"+j.to_s+"."+ext)
 								@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
+								break if @agent.page.body.empty?
 								@enter_critical.call
 								@agent.page.save_as(id+"/"+id+(big ? "_big":"")+"_p"+j.to_s+"."+ext)
 								@exit_critical.call

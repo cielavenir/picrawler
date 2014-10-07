@@ -89,7 +89,8 @@ class Picrawler::Gelbooru
 		array.each{|e|
 			bookmark=0
 			#if e=~/(\d+).+?(http\:\/\/img.+?\.gelbooru\.com\/thumbs\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
-			if e=~/(\d+).+?(http\:\/\/[0-9a-z]+\.gelbooru\.com\/thumbnails\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
+			#if e=~/(\d+).+?(http\:\/\/[0-9a-z]+\.gelbooru\.com\/thumbnails\/[0-9]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
+			if e=~/(\d+).+?(http\:\/\/gelbooru\.com\/thumbnails\/[0-9a-fA-F]+\/[0-9a-fA-F]+\/thumbnail_[0-9a-fA-F\/]+\.(jpeg|jpg|png|gif)(?:\?[0-9]+)?)/m
 				if @bookmark>0 && bookmark<@bookmark then next end
 				@content.push([$1+'.'+$3, $2.sub("/thumbnail_","/").sub("/thumbnails/","/images/")])
 			end
@@ -103,24 +104,26 @@ class Picrawler::Gelbooru
 
 	def crawl
 		@content.each_with_index{|e,i| # e[0] -> filename, e[1] -> URL
+			#wtf this funny hotfix!?
+			url_without_ext=e[1].split('.')[0..-2]*'.'
 			if @filter.include?(File.basename(e[0],".*"))
 				if @fast then @seek_end=true end
 			else
-				#["jpg","jpeg","png","gif","err"].each{|ext|
-				#	if ext=="err" then raise "[Programmer's fault: failed "+e[0] end
-				#	begin
-						@agent.get(e[1], [], 'http://gelbooru.com/') #2.1 syntax
+				["jpg","jpeg","png","gif","err"].each{|ext|
+					if ext=="err" then raise "[Programmer's fault: failed "+e[0] end
+					begin
+						@agent.get(url_without_ext+'.'+ext, [], 'http://gelbooru.com/') #2.1 syntax
 						@enter_critical.call
 						@agent.page.save_as(e[0])
 						@exit_critical.call
 						sleep(@sleep)
-				#	rescue
-				#		sleep(1)
-				#	else
-				#		break
-				#	end
-				#	#search next ext.
-				#}
+					rescue
+						sleep(1)
+					else
+						break
+					end
+					#search next ext.
+				}
 			end
 			@notifier.call sprintf("Page %d %d/%d    \r",@page,i+1,@content.length) 
 		}
