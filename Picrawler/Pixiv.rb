@@ -49,6 +49,7 @@ class Picrawler::Pixiv
 		@stop=options[:stop]||-1
 		@additional=options[:additional]||''
 		@seek_end=false
+		@__cnt__=1
 	end
 
 	def member_first(options={})
@@ -327,7 +328,10 @@ class Picrawler::Pixiv
 		if @novel
 			@content.each_with_index{|e,i| # e -> ID
 				if @filter.include?(e)
-					if @fast then @seek_end=true end
+					if @fast then
+						@__cnt__-=1
+						@seek_end=true if @__cnt__<=0
+					end
 				else
 					@agent.get("http://www.pixiv.net/novel/show.php?id="+e, [], 'http://www.pixiv.net/') #2.1 syntax
 					text=@agent.page.body.split(%Q(id="novel_text">))[1].split("</textarea>")[0]
@@ -341,7 +345,10 @@ class Picrawler::Pixiv
 		else
 			@content.each_with_index{|id,i| # e[0] -> ID, e[1] -> base URL, e[2] -> ext
 				if @filter.include?(id)
-					if @fast then @seek_end=true end
+					if @fast then
+						@__cnt__-=1
+						@seek_end=true if @__cnt__<=0
+					end
 				else
 					#puts "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id
 					@agent.get("http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id, [], 'http://www.pixiv.net/') #2.1 syntax
@@ -373,27 +380,23 @@ class Picrawler::Pixiv
 						raise "[Developer's fault] Picture URL scheme changed"
 					end
 					base=$1
-					ext=$2
-					illust=html.index('member_illust.php?mode=big&amp;illust_id='+id)
+					ext=$2 # used only in comic-legacy
 					comic=html.index('member_illust.php?mode=manga&amp;illust_id='+id)
-					if (illust&&comic) || (!illust&&!comic)
-						raise "[Developer's fault] Big link changed"
-					end
 					sleep(1)
-					if illust
-						@agent.get("http://www.pixiv.net/member_illust.php?mode=big&illust_id="+id, [], "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id) #2.1 syntax
-						sleep(1)
-						@agent.page.body=~/img src="(.+?)"/
-						@agent.get($1, [], "http://www.pixiv.net/member_illust.php?mode=big&illust_id="+id) #2.1 syntax
-						@enter_critical.call
-						@agent.page.save_as(id+"."+ext)
-						@exit_critical.call
-						sleep(@sleep)
-					elsif comic
+					if comic
+						url_comic=base.sub(/#{id}_m\./,"#{id}_big_p0.") # legacy URL
 						#Dir.mkdir(id)
-						url_comic=base.sub(/#{id}_([0-9a-zA-Z_-]*)m\./,"#{id}_\\1big_p0.")
 						big=true
 						begin #big
+							if base.include?('/img-master/')
+								@agent.get("http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=#{id}&page=0", [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
+								sleep(1)
+								@agent.page.body=~/img src="(.+?)"/
+								url_comic=$1
+								ext=url_comic.split('.')[-1]
+								ext=ext.split('?')[0] if ext.include?('?')
+								raise unless url_comic.include?('big') # goto normal
+							end
 							@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
 							Dir.mkdir(id)
 							@enter_critical.call
@@ -401,7 +404,7 @@ class Picrawler::Pixiv
 							@exit_critical.call
 							sleep(@sleep)
 						rescue #normal
-							url_comic=base.sub(/#{id}_([0-9a-zA-Z_-]*)m\./,"#{id}_\\1p0.")
+							url_comic=url_comic.sub(/#{id}_big_p0\./,"#{id}_p0.")
 							big=false
 							# *** if exception is thown here, something is really wrong. ***
 							@agent.get(url_comic, [], "http://www.pixiv.net/member_illust.php?mode=manga&illust_id="+id) #2.1 syntax
@@ -427,6 +430,23 @@ class Picrawler::Pixiv
 								@notifier.call sprintf("Page %d %d/%d Comic %d\r",@page,i+1,@content.length,j)
 							end
 						rescue; end
+					else #illust
+						if @agent.page.body=~/img (.*?)src="(.+?)" class="original-image"/
+							ext=$2.split('.')[-1]
+							ext=ext.split('?')[0] if ext.include?('?')
+							@agent.get($2, [], "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id) #2.1 syntax
+						else
+							@agent.get("http://www.pixiv.net/member_illust.php?mode=big&illust_id=#{id}&page=0", [], "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id) #2.1 syntax
+							sleep(1)
+							@agent.page.body=~/img src="(.+?)"/
+							ext=$1.split('.')[-1]
+							ext=ext.split('?')[0] if ext.include?('?')
+							@agent.get($1, [], "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id) #2.1 syntax
+						end
+						@enter_critical.call
+						@agent.page.save_as(id+"."+ext)
+						@exit_critical.call
+						sleep(@sleep)
 					end
 				end
 				@notifier.call sprintf("Page %d %d/%d              \r",@page,i+1,@content.length)

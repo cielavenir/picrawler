@@ -144,6 +144,8 @@ Added Pixiv ugoira support.
 Fixed NicoSeiga/DeviantART/Flickr.
 0.34.141008
 Fixed Pixiv/Gelbooru/Minitokyo.
+0.35.150302
+Fixed Pixiv.
 
 [Creative Commons CC0]
 Statement of Purpose
