@@ -28,7 +28,7 @@ class Picrawler::Pixiv
 		end
 
 		#normal auth.
-		form = @agent.get('http://www.pixiv.net/').form_with(:action=>'/login.php')
+		form = @agent.get('http://www.pixiv.net/login.php').form_with(:action=>'/login.php')
 		form.pixiv_id = user
 		form.pass = pass
 		form.checkbox_with("skip").check
@@ -70,7 +70,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.split("class=\"image-item \"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -144,7 +144,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item \"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -185,7 +185,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item \"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -226,7 +226,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item \"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0

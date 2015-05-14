@@ -146,6 +146,8 @@ Fixed NicoSeiga/DeviantART/Flickr.
 Fixed Pixiv/Gelbooru/Minitokyo.
 0.35.150302
 Fixed Pixiv.
+0.35a.150513
+Fixed Pixiv.
 
 [Creative Commons CC0]
 Statement of Purpose
