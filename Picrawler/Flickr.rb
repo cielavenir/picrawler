@@ -132,7 +132,7 @@ class Picrawler::Flickr
 				if @fast then @seek_end=true end
 			else
 				@agent.get(e, [], 'https://www.flickr.com/') #2.1 syntax
-				@agent.page.body.resolve=~/\<a href=\"(https:\/\/farm\d+.staticflickr.com\/\d+\/.+?_d\.([a-z]+?)(?:\?.+)?)\"\>/
+				@agent.page.body.resolve=~/\<a href=\"(https:\/\/(?:farm|c)\d+.staticflickr.com\/\d+\/.+?_d\.([a-z]+?)(?:\?.+)?)\"\>/
 				url=$1
 				ext=$2
 				sleep(1)

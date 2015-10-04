@@ -148,6 +148,8 @@ Fixed Pixiv/Gelbooru/Minitokyo.
 Fixed Pixiv.
 0.35a.150513
 Fixed Pixiv.
+0.35b.151005
+Fixed Pixiv and Flickr.
 
 [Creative Commons CC0]
 Statement of Purpose

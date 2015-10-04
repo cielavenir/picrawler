@@ -89,6 +89,7 @@ class Picrawler::Pixiv
 			end
 		}
 		if @content.length<1 then return false end
+		@content.uniq!
 		sleep(@sleep)
 		return true
 	end
@@ -122,6 +123,7 @@ class Picrawler::Pixiv
 			end
 		}
 		if @content.length<1 then return false end
+		@content.uniq!
 		sleep(@sleep)
 		return true
 	end
@@ -163,6 +165,7 @@ class Picrawler::Pixiv
 			end
 		}
 		if @content.length<1 then return false end
+		@content.uniq!
 		sleep(@sleep)
 		return true
 	end
@@ -204,6 +207,7 @@ class Picrawler::Pixiv
 			end
 		}
 		if @content.length<1 then return false end
+		@content.uniq!
 		sleep(@sleep)
 		return true
 	end
@@ -245,6 +249,7 @@ class Picrawler::Pixiv
 			end
 		}
 		if @content.length<1 then return false end
+		@content.uniq!
 		sleep(@sleep)
 		return true
 	end
@@ -278,6 +283,7 @@ class Picrawler::Pixiv
 			end
 		}
 		if @content.length<1 then return false end
+		@content.uniq!
 		sleep(@sleep)
 		return true
 	end
@@ -320,6 +326,7 @@ class Picrawler::Pixiv
 			end
 		}
 		if @content.length<1 then return false end
+		@content.uniq!
 		sleep(@sleep)
 		return true
 	end
@@ -352,7 +359,7 @@ class Picrawler::Pixiv
 				else
 					#puts "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id
 					@agent.get("http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id, [], 'http://www.pixiv.net/') #2.1 syntax
-					html=@agent.page.body.resolve.split('<body')[1]
+					html=@agent.page.body.resolve.split('<body',2)[1]
 					ugoira=html.index('pixiv.context.ugokuIllustFullscreenData  = ')
 					if ugoira
 						html=~/pixiv.context.ugokuIllustFullscreenData  = (.+?);/
