@@ -70,7 +70,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.split("class=\"image-item \"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -146,7 +146,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item \"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -188,7 +188,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item \"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -230,7 +230,7 @@ class Picrawler::Pixiv
 
 		unless @agent.page.body.resolve=~/rel="next"/ then @seek_end=true end
 		@content=[]
-		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item \"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
+		array=@agent.page.body.resolve.gsub(/<!--.*?-->/m,'').split("class=\"image-item\"><a href=\"/member_illust.php?mode=medium&amp;illust_id=")
 		array.shift
 		array.each{|e|
 			bookmark=0
@@ -357,6 +357,7 @@ class Picrawler::Pixiv
 						@seek_end=true if @__cnt__<=0
 					end
 				else
+					@filter.push(id) # if referred, something wrong is going on...
 					#puts "http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id
 					@agent.get("http://www.pixiv.net/member_illust.php?mode=medium&illust_id="+id, [], 'http://www.pixiv.net/') #2.1 syntax
 					html=@agent.page.body.resolve.split('<body',2)[1]
