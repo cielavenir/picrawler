@@ -152,6 +152,8 @@ Fixed Pixiv.
 Fixed Pixiv and Flickr.
 0.35c.160319
 Fixed Pixiv and Piapro.
+0.35d.160902
+Fixed Pixiv.
 
 [Creative Commons CC0]
 Statement of Purpose

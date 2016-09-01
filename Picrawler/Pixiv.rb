@@ -28,10 +28,10 @@ class Picrawler::Pixiv
 		end
 
 		#normal auth.
-		form = @agent.get('http://www.pixiv.net/login.php').form_with(:action=>'/login.php')
+		form = @agent.get('https://accounts.pixiv.net/login').form_with(:action=>'/login')
 		form.pixiv_id = user
-		form.pass = pass
-		form.checkbox_with("skip").check
+		form.password = pass
+		#form.checkbox_with("skip").check
 		if @agent.submit(form).body.resolve =~ /ログアウト/ || @agent.submit(form).body.resolve =~ /Logout/
 			@agent.cookie_jar.save_as(cookie)
 			return 0

@@ -25,7 +25,7 @@ end
 
 #require_relative shouldn't be used. Picrawler.rb might be called as symlink.
 
-Version = "0.35c.160319"
+Version = "0.35d.160902"
 
 ###Libraries
 class Object
